@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Encontre ofertas e promoções selecionadas no Muitas Ofertas.">
+    <title>Muitas Ofertas | Economize de verdade!</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="topo">
+        <div class="container">
+            <h1>🔥 Muitas Ofertas</h1>
+            <p>As melhores oportunidades para economizar!</p>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="busca">
+            <input
+                type="search"
+                id="campoBusca"
+                placeholder="O que você está procurando?"
+            >
+        </section>
+
+        <section class="categorias">
+            <h2>Categorias</h2>
+
+            <div id="listaCategorias">
+                <button class="categoria ativa" data-categoria="Todas">Todas</button>
+                <button class="categoria" data-categoria="Eletrônicos">Eletrônicos</button>
+                <button class="categoria" data-categoria="Casa">Casa</button>
+                <button class="categoria" data-categoria="Informática">Informática</button>
+            </div>
+        </section>
+
+        <section class="ofertas">
+            <h2>🔥 Ofertas em destaque</h2>
+            <div id="listaProdutos" class="produtos"></div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 Muitas Ofertas</p>
+        <p>Ofertas selecionadas para ajudar você a economizar.</p>
+        <small>Este site pode receber comissão por compras realizadas através de links de afiliados.</small>
+    </footer>
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>
