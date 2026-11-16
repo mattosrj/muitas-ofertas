@@ -179,6 +179,7 @@ function editarProduto(produto) {
   $("categoria").value = produto.categoria || "";
   $("link").value = produto.link;
   $("imagem").value = produto.imagem || "";
+  $("codigo-cupom").value = produto.codigo_cupom || "";
 
   $("titulo-formulario").textContent =
     "✏️ Editar oferta";
@@ -238,6 +239,7 @@ formularioProduto.addEventListener(
         loja: $("loja").value,
         categoria: $("categoria").value.trim() || null,
         link: validarUrl($("link").value),
+        codigo_cupom: $("codigo-cupom").value.trim() || null,
         imagem: $("imagem").value.trim()
           ? validarUrl($("imagem").value)
           : null
@@ -312,6 +314,7 @@ function gerarMensagem(produto) {
     `👉 Veja esta oferta em ${produto.loja}`,
     "",
     `💰 ${preco}`,
+    ...(produto.codigo_cupom ? ["", `🎟️ Cupom: ${produto.codigo_cupom}`] : []),
     "",
     `🔗 ${produto.link}`,
     "",
@@ -376,9 +379,70 @@ function criarCard(produto) {
     copiarMensagem(produto);
   });
 
-  acoes.append(botaoEditar, botaoWhatsApp);
+  // Publicar ou tirar do ar: mantém o cadastro, sem apagar a oferta.
+  const botaoPublicar = document.createElement("button");
+  botaoPublicar.type = "button";
+  botaoPublicar.textContent = produto.publicado
+    ? "📥 Tirar do ar"
+    : "🚀 Publicar";
+  botaoPublicar.className = produto.publicado ? "secundario" : "";
 
-  card.append(nome, preco, detalhes, situacao, acoes);
+  botaoPublicar.addEventListener("click", async () => {
+    const novoStatus = !Boolean(produto.publicado);
+    botaoPublicar.disabled = true;
+    informar($("resultado"), novoStatus ? "Publicando oferta..." : "Retirando oferta do ar...");
+
+    try {
+      // Confirmar a sessão e o papel do usuário antes de enviar a alteração.
+      // A proteção definitiva deve ser reforçada pelas políticas RLS do banco.
+      const { data: usuarioDados, error: erroUsuario } = await supabase.auth.getUser();
+      const usuario = usuarioDados?.user;
+      if (erroUsuario || !usuario) throw new Error("Faça login novamente.");
+
+      const { data: perfil, error: erroPerfil } = await supabase
+        .from("perfis")
+        .select("papel")
+        .eq("id", usuario.id)
+        .single();
+      if (erroPerfil || perfil?.papel !== "admin") {
+        throw new Error("Seu usuário não tem permissão de administrador.");
+      }
+
+      const { data: alterado, error } = await supabase
+        .from("produtos")
+        .update({
+          publicado: novoStatus,
+          atualizado_em: new Date().toISOString()
+        })
+        .eq("id", produto.id)
+        .eq("publicado", Boolean(produto.publicado))
+        .select("id, publicado")
+        .single();
+      if (error || !alterado || alterado.publicado !== novoStatus) {
+        throw new Error("Não foi possível alterar a publicação. Verifique as permissões RLS.");
+      }
+
+      informar($("resultado"), novoStatus
+        ? "✅ Oferta publicada com sucesso!"
+        : "✅ Oferta retirada do ar!", "sucesso");
+      await carregarOfertas();
+    } catch (erro) {
+      console.error("Erro ao publicar/despublicar:", erro);
+      informar($("resultado"), erro.message || "Erro ao atualizar publicação.", "erro");
+      botaoPublicar.disabled = false;
+    }
+  });
+
+  acoes.append(botaoEditar, botaoWhatsApp, botaoPublicar);
+
+  card.append(nome, preco);
+  if (produto.codigo_cupom) {
+    const visualizacaoCupom = document.createElement("p");
+    visualizacaoCupom.className = "info";
+    visualizacaoCupom.textContent = `🎟️ Cupom: ${produto.codigo_cupom}`;
+    card.appendChild(visualizacaoCupom);
+  }
+  card.append(detalhes, situacao, acoes);
 
   return card;
 }
