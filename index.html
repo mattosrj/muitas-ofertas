@@ -1,58 +1,101 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Encontre ofertas e promoções selecionadas no Muitas Ofertas.">
-    <title>Muitas Ofertas | Economize de verdade!</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Encontre ofertas, promoções e cupons selecionados no Muitas Ofertas.">
+  <title>Muitas Ofertas | Economize de verdade!</title>
 
-    <link rel="stylesheet" href="css/style.css">
+  <!-- Aplica a preferência salva antes do CSS, evitando um clarão ao abrir a página. -->
+  <script>
+    try {
+      const temaSalvo = localStorage.getItem('muitas-ofertas-tema');
+      const ehDesktop = window.matchMedia('(min-width: 769px)').matches;
+      if (ehDesktop && (temaSalvo === 'light' || temaSalvo === 'dark')) {
+        document.documentElement.setAttribute('data-theme', temaSalvo);
+      }
+    } catch (erro) {
+      // O site continua funcionando se o navegador bloquear o armazenamento.
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- CABEÇALHO -->
+  <header class="topo">
+    <div class="container topo-conteudo">
+      <div class="topo-texto">
+        <h1>🔥 Muitas Ofertas</h1>
+        <p>As melhores oportunidades para economizar!</p>
+      </div>
 
-    <header class="topo">
-        <div class="container">
-            <h1>🔥 Muitas Ofertas</h1>
-            <p>As melhores oportunidades para economizar!</p>
-        </div>
-    </header>
+      <!-- Aparece apenas no computador. title mostra a legenda ao passar o mouse. -->
+      <div class="tema-controle" role="group" aria-label="Escolher tema">
+        <button class="tema-botao" type="button" data-tema="light"
+                title="Ativar tema claro" aria-label="Ativar tema claro" aria-pressed="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+          </svg>
+        </button>
+        <button class="tema-botao" type="button" data-tema="dark"
+                title="Ativar tema escuro" aria-label="Ativar tema escuro" aria-pressed="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M20.7 14.3A8.5 8.5 0 0 1 9.7 3.3 8.5 8.5 0 1 0 20.7 14.3z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <main class="container">
+  <!-- CONTEÚDO PRINCIPAL: mesmos IDs usados pelo JavaScript dos produtos. -->
+  <main class="container">
+    <section class="busca" aria-label="Pesquisar produtos">
+      <input type="search" id="campoBusca"
+             placeholder="O que você está procurando?"
+             aria-label="Pesquisar produtos">
+    </section>
 
-        <section class="busca">
-            <input
-                type="search"
-                id="campoBusca"
-                placeholder="O que você está procurando?"
-            >
-        </section>
+    <section class="categorias">
+      <h2>Categorias</h2>
+      <div id="listaCategorias">
+        <button class="categoria ativa" data-categoria="Todas">Todas</button>
+        <button class="categoria" data-categoria="Eletrônicos">Eletrônicos</button>
+        <button class="categoria" data-categoria="Casa">Casa</button>
+        <button class="categoria" data-categoria="Informática">Informática</button>
+      </div>
+    </section>
 
-        <section class="categorias">
-            <h2>Categorias</h2>
+    <section class="ofertas">
+      <h2>🔥 Ofertas em destaque</h2>
+      <div id="listaProdutos" class="produtos"></div>
+    </section>
+  </main>
 
-            <div id="listaCategorias">
-                <button class="categoria ativa" data-categoria="Todas">Todas</button>
-                <button class="categoria" data-categoria="Eletrônicos">Eletrônicos</button>
-                <button class="categoria" data-categoria="Casa">Casa</button>
-                <button class="categoria" data-categoria="Informática">Informática</button>
-            </div>
-        </section>
+  <!-- AVISO DISCRETO, LOGO ACIMA DO RODAPÉ -->
+  <section class="aviso-ofertas" aria-label="Informações sobre ofertas e cupons">
+    <div class="aviso-ofertas-conteudo">
+      <h2>ℹ️ Informações importantes</h2>
+      <p>O <strong>Muitas Ofertas</strong> é um portal independente que divulga promoções e cupons de lojas online. Não realizamos vendas diretamente.</p>
+      <p>Preços, estoques, condições de frete e validade dos cupons podem mudar ou acabar sem aviso prévio. Confira o valor final e as condições diretamente na loja antes de comprar.</p>
+      <p class="aviso-afiliados">#publi — Alguns links são de afiliados. Podemos receber comissões por compras feitas por meio deles.</p>
+    </div>
+  </section>
 
-        <section class="ofertas">
-            <h2>🔥 Ofertas em destaque</h2>
-            <div id="listaProdutos" class="produtos"></div>
-        </section>
+  <footer>
+    <p>© 2026 Muitas Ofertas</p>
+    <p>Ofertas selecionadas para ajudar você a economizar.</p>
+    <small>Este site pode receber comissão por compras realizadas através de links de afiliados.</small>
+  </footer>
 
-    </main>
-
-    <footer>
-        <p>© 2026 Muitas Ofertas</p>
-        <p>Ofertas selecionadas para ajudar você a economizar.</p>
-        <small>Este site pode receber comissão por compras realizadas através de links de afiliados.</small>
-    </footer>
-
-    <script src="js/script.js"></script>
-
+  <!-- Mantemos o script original dos produtos. -->
+  <script src="js/script.js"></script>
+  <script src="js/tema.js"></script>
 </body>
 </html>

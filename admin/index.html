@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Admin | Muitas Ofertas</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f3f5f9;
+      font-family: Arial, sans-serif;
+      color: #202733;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 720px;
+      margin: 35px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px #00000012;
+    }
+
+    h1 { text-align: center; margin-bottom: 5px; }
+
+    .subtitulo {
+      text-align: center;
+      color: #666;
+      margin-bottom: 25px;
+    }
+
+    h2, h3 { margin-top: 22px; }
+
+    label {
+      display: block;
+      margin: 15px 0 6px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+      font-size: 16px;
+      background: white;
+    }
+
+    button {
+      padding: 12px 17px;
+      border: 0;
+      border-radius: 7px;
+      background: #166534;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .secundario { background: #374151; }
+
+    .botao-largo {
+      width: 100%;
+      margin-top: 18px;
+    }
+
+    .linha {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .topo, .acoes {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .acoes { justify-content: flex-start; }
+
+    .info {
+      color: #666;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    #painel, #btn-cancelar { display: none; }
+
+    #mensagem, #resultado {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 7px;
+      text-align: center;
+    }
+
+    #mensagem:empty, #resultado:empty {
+      display: none;
+    }
+
+    .sucesso {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .erro {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .card-produto {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+
+    .card-produto h4 { margin: 0 0 10px; }
+
+    .destaque {
+      color: #166534;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .edicao {
+      padding: 12px;
+      background: #eff6ff;
+      border-radius: 8px;
+      margin: 12px 0;
+      color: #1d4ed8;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 15px auto;
+        padding: 20px;
+      }
+
+      .linha { grid-template-columns: 1fr; }
+
+      .acoes button { flex: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <h1>🛍️ Muitas Ofertas</h1>
+    <p class="subtitulo">Painel administrativo</p>
+
+    <!-- LOGIN -->
+    <form id="form-login">
+      <label for="email">E-mail</label>
+      <input id="email" type="email"
+             autocomplete="username" required>
+
+      <label for="senha">Senha</label>
+      <input id="senha" type="password"
+             autocomplete="current-password" required>
+
+      <button id="btn-entrar"
+              type="submit" class="botao-largo">
+        Entrar
+      </button>
+    </form>
+
+    <!-- ÁREA ADMINISTRATIVA -->
+    <section id="painel">
+      <div class="topo">
+        <div>
+          <h2>Gerenciar ofertas</h2>
+          <p id="usuario-logado" class="info"></p>
+        </div>
+
+        <button id="btn-sair"
+                type="button" class="secundario">
+          Sair
+        </button>
+      </div>
+
+      <hr>
+
+      <h3 id="titulo-formulario">
+        ➕ Cadastrar nova oferta
+      </h3>
+
+      <p id="aviso-edicao"
+         class="edicao" hidden>
+        ✏️ Você está editando uma oferta existente.
+      </p>
+
+      <form id="form-produto">
+        <label for="nome">Nome do produto</label>
+        <input id="nome" type="text"
+               maxlength="250" required>
+
+        <div class="linha">
+          <div>
+            <label for="preco">Preço (R$)</label>
+            <input id="preco" type="text"
+                   inputmode="decimal"
+                   placeholder="228,00" required>
+          </div>
+
+          <div>
+            <label for="loja">Loja</label>
+            <select id="loja" required>
+              <option value="">Selecione</option>
+              <option>Mercado Livre</option>
+              <option>Amazon</option>
+              <option>Shopee</option>
+              <option>Magalu</option>
+              <option>AliExpress</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="categoria">Categoria</label>
+        <input id="categoria" type="text"
+               maxlength="100"
+               placeholder="Ex.: Moda">
+
+        <label for="link">Link de afiliado</label>
+        <input id="link" type="url"
+               placeholder="https://..." required>
+
+        <label for="imagem">
+          URL da imagem (opcional)
+        </label>
+        <input id="imagem" type="url"
+               placeholder="https://...">
+
+        <p class="info">
+          A imagem poderá ser obtida automaticamente
+          em uma próxima etapa.
+        </p>
+
+        <button id="btn-salvar"
+                type="submit" class="botao-largo">
+          Salvar oferta
+        </button>
+
+        <button id="btn-cancelar"
+                type="button"
+                class="secundario botao-largo">
+          Cancelar edição
+        </button>
+      </form>
+
+      <div id="resultado" role="status"></div>
+
+      <hr style="margin-top:30px">
+
+      <div class="topo">
+        <h3>📦 Ofertas cadastradas</h3>
+
+        <button id="btn-atualizar"
+                type="button" class="secundario">
+          Atualizar lista
+        </button>
+      </div>
+
+      <p id="status-lista"
+         class="info" role="status"></p>
+
+<label for="pesquisar-produto">
+  🔎 Pesquisar oferta
+</label>
+
+<input
+  type="search"
+  id="pesquisar-produto"
+  placeholder="Buscar por nome, loja ou categoria..."
+  autocomplete="off"
+>
+
+      <div id="lista-produtos"></div>
+    </section>
+
+    <div id="mensagem" role="status"></div>
+  </main>
+
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>
