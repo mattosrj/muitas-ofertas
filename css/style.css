@@ -1,242 +1,250 @@
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ==========================================
+   MUITAS OFERTAS — IDENTIDADE E TEMAS
+   Claro por padrão; automático se seguir o sistema;
+   a escolha manual do desktop usa data-theme.
+========================================== */
+:root {
+  color-scheme: light;
+  --cor-fundo: #f3f5f9;
+  --cor-card: #ffffff;
+  --cor-texto: #172033;
+  --cor-texto-secundario: #526071;
+  --cor-borda: #dce2ea;
+  --cor-campo: #ffffff;
+  --cor-categoria: #ffffff;
+  --cor-imagem: #fafafa;
+  --cor-loja: #eeeeee;
+  --cor-loja-texto: #333333;
+  --cor-preco: #16833c;
+  --cor-pendente: #eeeeee;
 }
 
+/* Modo escuro AUTOMÁTICO quando não há uma preferência manual. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --cor-fundo: #10151d;
+    --cor-card: #1c2532;
+    --cor-texto: #f1f5f9;
+    --cor-texto-secundario: #aab7c8;
+    --cor-borda: #344154;
+    --cor-campo: #263142;
+    --cor-categoria: #263142;
+    --cor-imagem: #263142;
+    --cor-loja: #344154;
+    --cor-loja-texto: #f1f5f9;
+    --cor-preco: #6ee7a2;
+    --cor-pendente: #344154;
+  }
+}
+
+/* Modo escuro MANUAL no computador. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --cor-fundo: #10151d;
+  --cor-card: #1c2532;
+  --cor-texto: #f1f5f9;
+  --cor-texto-secundario: #aab7c8;
+  --cor-borda: #344154;
+  --cor-campo: #263142;
+  --cor-categoria: #263142;
+  --cor-imagem: #263142;
+  --cor-loja: #344154;
+  --cor-loja-texto: #f1f5f9;
+  --cor-preco: #6ee7a2;
+  --cor-pendente: #344154;
+}
+
+/* O modo claro manual usa os valores padrão do :root. */
+:root[data-theme="light"] { color-scheme: light; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    color: #222;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
 }
+.container { width: 90%; max-width: 1150px; margin: auto; }
 
-.container {
-    width: 90%;
-    max-width: 1150px;
-    margin: auto;
-}
-
+/* Cabeçalho */
 .topo {
-    background: #171717;
-    color: white;
-    padding: 30px 0;
-    border-bottom: 4px solid #ffcc00;
+  background: #171717;
+  color: #ffffff;
+  padding: 30px 0;
+  border-bottom: 4px solid #ffcc00;
 }
-
-.topo h1 {
-    color: #ffcc00;
-    font-size: 30px;
-    margin-bottom: 8px;
+.topo-conteudo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
 }
+.topo-texto { min-width: 0; }
+.topo h1 { color: #ffcc00; font-size: 30px; margin-bottom: 8px; }
+.topo p { color: #dddddd; }
 
-.topo p {
-    color: #ddd;
+/* Dois ícones pequenos, discretos, no canto superior direito. */
+.tema-controle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
 }
-
-.busca {
-    margin: 30px 0;
+.tema-botao {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
 }
+.tema-botao svg { width: 18px; height: 18px; }
+.tema-botao:hover { color: #ffffff; background: rgba(255,255,255,0.16); }
+.tema-botao[aria-pressed="true"] { background: #ffcc00; color: #171717; }
+.tema-botao:focus-visible { outline: 2px solid #ffcc00; outline-offset: 3px; }
 
+/* Pesquisa e filtros */
+.busca { margin: 30px 0; }
 .busca input {
-    width: 100%;
-    padding: 16px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  font-size: 16px;
+  background: var(--cor-campo);
+  color: var(--cor-texto);
 }
-
-.categorias,
-.ofertas {
-    margin-bottom: 35px;
-}
-
-h2 {
-    margin-bottom: 18px;
-}
-
-#listaCategorias {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
+.busca input::placeholder { color: var(--cor-texto-secundario); }
+.busca input:focus-visible { outline: 2px solid #ffcc00; outline-offset: 2px; }
+.categorias, .ofertas { margin-bottom: 35px; }
+h2 { margin-bottom: 18px; }
+#listaCategorias { display: flex; flex-wrap: wrap; gap: 10px; }
 .categoria {
-    padding: 10px 18px;
-    border: none;
-    border-radius: 20px;
-    background: white;
-    cursor: pointer;
+  padding: 10px 18px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 20px;
+  background: var(--cor-categoria);
+  color: var(--cor-texto);
+  cursor: pointer;
 }
+.categoria.ativa, .categoria:hover { background: #ffcc00; border-color: #ffcc00; color: #171717; }
 
-.categoria.ativa,
-.categoria:hover {
-    background: #ffcc00;
-    color: #171717;
-}
-
+/* Catálogo */
 .produtos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
 }
-
 .produto {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  min-width: 0;
+  background: var(--cor-card);
+  padding: 20px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
 }
-
-.produto .icone {
-    font-size: 48px;
-    text-align: center;
-    padding: 15px;
-}
-
-.produto h3 {
-    margin: 10px 0;
-}
-
-.produto .categoria-texto {
-    color: #777;
-    font-size: 13px;
-}
-
-.preco {
-    color: #16833c;
-    font-size: 23px;
-    font-weight: bold;
-    margin: 15px 0;
-}
-
+.produto .icone { font-size: 48px; text-align: center; padding: 15px; }
+.produto h3 { margin: 10px 0; overflow-wrap: anywhere; }
+.produto .categoria-texto { color: var(--cor-texto-secundario); font-size: 13px; }
+.preco { color: var(--cor-preco); font-size: 23px; font-weight: bold; margin: 15px 0; }
 .botao-oferta {
-    display: block;
-    background: #ffcc00;
-    color: #171717;
-    text-align: center;
-    padding: 12px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: bold;
+  display: block;
+  background: #ffcc00;
+  color: #171717;
+  text-align: center;
+  padding: 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
 }
-
-.botao-oferta:hover {
-    background: #e6b800;
-}
-
-footer {
-    background: #171717;
-    color: white;
-    text-align: center;
-    padding: 25px 15px;
-    line-height: 1.8;
-    margin-top: 40px;
-}
-
-footer small {
-    color: #bbb;
-}
-
-@media (max-width: 600px) {
-    .topo h1 {
-        font-size: 25px;
-    }
-
-    .produtos {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .produto {
-        padding: 12px;
-    }
-}
-
+.botao-oferta:hover { background: #e6b800; }
 .produto-imagem {
-    width: 100%;
-    height: 180px;
-    object-fit: contain;
-    border-radius: 8px;
-    background: #fafafa;
-    margin-bottom: 12px;
+  width: 100%;
+  height: 180px;
+  object-fit: contain;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--cor-imagem);
+  margin-bottom: 12px;
 }
-
-.link-pendente {
-    display: block;
-    background: #eeeeee;
-    color: #777;
-    padding: 12px;
-    text-align: center;
-    border-radius: 6px;
-    font-size: 13px;
-}
-
-/* Tablets */
-@media (max-width: 768px) {
-    .container {
-        width: 94%;
-    }
-
-    .topo {
-        padding: 24px 0;
-    }
-
-    .produtos {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .produto-imagem {
-        height: 150px;
-    }
-}
-
-/* Celulares pequenos */
-@media (max-width: 380px) {
-    .topo h1 {
-        font-size: 22px;
-    }
-
-    .produtos {
-        grid-template-columns: 1fr;
-    }
-
-    .produto-imagem {
-        height: 190px;
-    }
-
-    .categoria {
-        padding: 9px 12px;
-        font-size: 12px;
-    }
-}
-
-.produto-loja {
-    display: inline-block;
-    margin: 8px 0;
-    padding: 5px 9px;
-    border-radius: 5px;
-    background: #eeeeee;
-    color: #333333;
-    font-size: 12px;
-    font-weight: bold;
-}
-
+.produto-imagem img { width: 100%; height: 100%; object-fit: contain; }
 .imagem-fallback {
-    width: 100%;
-    height: 100%;
-    display: grid;
-    place-items: center;
-    font-size: 65px;
-    background: #f3f3f3;
+  width: 100%; height: 100%; display: grid; place-items: center;
+  font-size: 65px; background: var(--cor-imagem);
+}
+.produto-loja {
+  display: inline-block;
+  margin: 8px 0;
+  padding: 5px 9px;
+  border-radius: 5px;
+  background: var(--cor-loja);
+  color: var(--cor-loja-texto);
+  font-size: 12px;
+  font-weight: bold;
+}
+.link-pendente {
+  display: block;
+  background: var(--cor-pendente);
+  color: var(--cor-texto-secundario);
+  padding: 12px;
+  text-align: center;
+  border-radius: 6px;
+  font-size: 13px;
 }
 
-.produto-imagem {
-    overflow: hidden;
+/* Aviso integrado: faixa de texto antes do rodapé, não um card solto. */
+.aviso-ofertas {
+  width: 90%;
+  max-width: 1150px;
+  margin: 24px auto 0;
+  border-top: 1px solid var(--cor-borda);
+  padding: 20px 0 0;
 }
+.aviso-ofertas-conteudo {
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.aviso-ofertas h2 { font-size: 16px; color: var(--cor-texto); margin-bottom: 10px; }
+.aviso-ofertas p { margin: 7px 0; }
+.aviso-afiliados { font-size: 12px; }
 
-.produto-imagem img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+/* Rodapé */
+footer {
+  background: #171717;
+  color: #ffffff;
+  text-align: center;
+  padding: 25px 15px;
+  line-height: 1.8;
+  margin-top: 24px;
+}
+footer small { color: #bbbbbb; }
+
+/* Tablets e celulares: controle oculto, preferência do sistema. */
+@media (max-width: 768px) {
+  .container, .aviso-ofertas { width: 94%; }
+  .topo { padding: 24px 0; }
+  .tema-controle { display: none; }
+  .produtos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .produto { padding: 12px; }
+  .produto-imagem { height: 150px; }
+}
+@media (max-width: 600px) {
+  .topo h1 { font-size: 25px; }
+  .aviso-ofertas { padding-top: 18px; }
+}
+@media (max-width: 380px) {
+  .topo h1 { font-size: 22px; }
+  .produtos { grid-template-columns: 1fr; }
+  .produto-imagem { height: 190px; }
+  .categoria { padding: 9px 12px; font-size: 12px; }
 }
