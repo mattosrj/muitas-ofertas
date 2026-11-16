@@ -248,3 +248,92 @@ footer small { color: #bbbbbb; }
   .produto-imagem { height: 190px; }
   .categoria { padding: 9px 12px; font-size: 12px; }
 }
+
+/* Cupom opcional e ações dos cards; seguem as cores atuais do tema. */
+.produto-preco { color: var(--cor-preco); font-size: 23px; font-weight: 700; margin: 15px 0 9px; }
+.produto-cupom { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px; margin: 0 0 10px; border: 1px dashed var(--cor-borda); border-radius: 8px; background: var(--cor-campo); font-size: 13px; overflow-wrap: anywhere; }
+.produto-cupom > span { flex: 1; min-width: 100px; font-weight: 700; }
+.botao-copiar-cupom { padding: 8px 10px; border: 1px solid var(--cor-borda); border-radius: 6px; background: var(--cor-card); color: var(--cor-texto); font-weight: 700; cursor: pointer; }
+.produto-tempo { color: var(--cor-texto-secundario); font-size: 12px; margin: 8px 0 12px; }
+.produto-acoes { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.produto-acoes .botao-oferta { flex: 1 1 100%; }
+.botao-whatsapp { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: 1; padding: 10px 8px; border-radius: 6px; color: #fff; background: #168748; font-weight: 700; font-size: 13px; text-decoration: none; }
+.botao-whatsapp:hover { background: #11683a; }
+.botao-favorito { border: 1px solid var(--cor-borda); border-radius: 6px; min-width: 44px; padding: 8px; background: var(--cor-campo); color: var(--cor-texto); font-size: 24px; cursor: pointer; }
+.botao-favorito[aria-pressed="true"] { color: #df3950; }
+.botao-favorito:focus-visible, .botao-copiar-cupom:focus-visible, .botao-whatsapp:focus-visible { outline: 2px solid #ffcc00; outline-offset: 2px; }
+.catalogo-vazio { grid-column: 1 / -1; padding: 24px; border: 1px dashed var(--cor-borda); border-radius: 10px; color: var(--cor-texto-secundario); text-align: center; }
+@media (max-width: 768px) { .produto-cupom { padding: 8px; } .botao-whatsapp { font-size: 12px; } }
+
+/* Compartilhamento compacto, como na referência */
+.produto-acoes .botao-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    width: auto;
+    padding: 8px 12px;
+    min-height: 36px;
+    border-radius: 6px;
+    background: #14351f;
+    color: #4df58a;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.produto-acoes .botao-whatsapp:hover {
+    background: #20532f;
+}
+
+.produto-acoes .botao-whatsapp svg {
+    width: 15px;
+    height: 15px;
+}
+
+/* Ações compactas nos cards */
+.produto-acoes {
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+/* Botão compacto do WhatsApp */
+.produto-acoes .botao-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    align-self: center;
+    width: fit-content;
+    min-width: 0;
+    height: 34px;
+    min-height: 0;
+    padding: 0 10px;
+    gap: 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* Ícone do WhatsApp */
+.produto-acoes .botao-whatsapp svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* Botão de favoritos */
+.produto-acoes .botao-favorito {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 34px;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    min-height: 0;
+    padding: 0;
+    font-size: 21px;
+}
