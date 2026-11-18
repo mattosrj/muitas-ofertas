@@ -1,3 +1,29 @@
+const CATEGORIAS_BASE = [
+  "Eletrônicos",
+  "Smartphones",
+  "Ar e Ventilação",
+  "Jogos e video games",
+  "Moda e Acessórios",
+  "Casa e Decoração",
+  "Móveis",
+  "Saúde e Beleza",
+  "Livros e E-books",
+  "Alimentos e Bebidas",
+  "Esportes e Fitness",
+  "Automotivo",
+  "Brinquedos e Jogos",
+  "Bebê",
+  "Instrumentos Musicais",
+  "Produtos de Limpeza",
+  "Tecnologia",
+  "Viagens",
+  "Eco-friendly",
+  "Jardinagem",
+  "Papelaria",
+  "Utilidades domésticas",
+  "Eletrodomésticos",
+  "Ferramentas"
+];
 // Muitas Ofertas — catálogo público ligado ao Supabase.
 // Gerado pelo instalador. Não inserir service_role keys no navegador.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -11,6 +37,10 @@ const URL_WORKER = "https://muitas-ofertas-imagens.mattosde.workers.dev";
 const FAVORITOS_KEY = "muitas-ofertas-favoritos";
 let produtos = [];
 let categoriaAtual = "Todas";
+// MO-NAVEGACAO-2026-11-18
+let modoCatalogo = "todas";
+let catalogoPronto = false;
+
 let favoritos = carregarFavoritos();
 
 function carregarFavoritos() {
@@ -153,6 +183,7 @@ function criarCard(produto) {
     favorito.textContent = favoritos.has(id) ? "♥" : "♡";
     favorito.setAttribute("aria-label", favoritos.has(id) ? "Remover dos favoritos" : "Adicionar aos favoritos");
     favorito.setAttribute("aria-pressed", String(favoritos.has(id)));
+    if (modoCatalogo === "favoritos") filtrarProdutos();
   });
   acoes.appendChild(favorito);
   card.appendChild(acoes);
@@ -160,34 +191,44 @@ function criarCard(produto) {
 }
 function desenharCategorias() {
   if (!categorias) return;
-  const valores = ["Todas", ...new Set(produtos.map(p => p.categoria).filter(Boolean))];
+  const valores = ["Todas", ...[...new Set([...CATEGORIAS_BASE, ...produtos.map(p => p.categoria).filter(Boolean)])].filter(n => n !== "Todas").sort((a,b)=>a.localeCompare(b,"pt-BR"))];
   if (!valores.includes(categoriaAtual)) categoriaAtual = "Todas";
   categorias.replaceChildren();
-  valores.forEach(nome => {
+  for (const nome of valores) {
     const botao = criar("button", "categoria" + (nome === categoriaAtual ? " ativa" : ""), nome);
     botao.type = "button";
     botao.dataset.categoria = nome;
+    botao.setAttribute("aria-pressed", String(nome === categoriaAtual));
     botao.addEventListener("click", () => {
       categoriaAtual = nome;
-      desenharCategorias();
-      filtrarProdutos();
+      desenharCategorias(); filtrarProdutos();
+      const menu = document.getElementById("menuCategorias");
+      menu.open = false; menu.querySelector("summary").focus();
     });
     categorias.appendChild(botao);
-  });
+  }
+}
+function atualizarNavegacao() {
+  document.getElementById("navCupons").setAttribute("aria-pressed", String(modoCatalogo === "cupons"));
+  document.getElementById("navFavoritos").setAttribute("aria-pressed", String(modoCatalogo === "favoritos"));
+  document.getElementById("tituloOfertas").textContent = modoCatalogo === "cupons" ? "🎟️ Ofertas com cupom" : modoCatalogo === "favoritos" ? "♡ Meus favoritos" : "🔥 Ofertas em destaque";
+  document.getElementById("categoriaSelecionada").textContent = categoriaAtual === "Todas" ? "Todos os produtos" : categoriaAtual;
+  document.getElementById("filtroAtual").hidden = categoriaAtual === "Todas" && modoCatalogo === "todas" && !busca.value.trim();
 }
 function filtrarProdutos() {
   if (!container) return;
+  atualizarNavegacao();
+  if (!catalogoPronto) return;
   const termo = (busca?.value || "").trim().toLocaleLowerCase("pt-BR");
   const filtrados = produtos.filter(produto => {
     const procura = [produto.nome, produto.loja, produto.categoria, produto.codigo_cupom]
       .filter(Boolean).join(" ").toLocaleLowerCase("pt-BR");
-    return (categoriaAtual === "Todas" || produto.categoria === categoriaAtual) && procura.includes(termo);
+    const modoOk = modoCatalogo === "todas" || (modoCatalogo === "cupons" && Boolean(produto.codigo_cupom?.trim())) || (modoCatalogo === "favoritos" && favoritos.has(String(produto.id)));
+    return modoOk && (categoriaAtual === "Todas" || produto.categoria === categoriaAtual) && procura.includes(termo);
   });
   container.replaceChildren();
   if (!filtrados.length) {
-    const texto = produtos.length
-      ? "Nenhuma oferta corresponde à sua pesquisa."
-      : "Ainda não há ofertas publicadas. Volte em breve!";
+    const texto = modoCatalogo === "favoritos" ? "Nenhuma oferta favorita corresponde aos filtros. Use o coração de uma oferta para salvá-la." : modoCatalogo === "cupons" ? "Nenhuma oferta com cupom corresponde aos filtros." : produtos.length ? "Nenhuma oferta corresponde à sua pesquisa." : "Ainda não há ofertas publicadas. Volte em breve!";
     container.appendChild(criar("p", "catalogo-vazio", texto));
     return;
   }
@@ -207,6 +248,7 @@ async function carregarOfertasPublicadas() {
     return;
   }
   produtos = data || [];
+  catalogoPronto = true;
   desenharCategorias();
   filtrarProdutos();
   // Tenta preencher imagens sem URL; falhas do serviço externo não impedem o catálogo.
@@ -221,5 +263,32 @@ async function carregarOfertasPublicadas() {
     } catch (erro) { console.debug("Prévia de imagem indisponível", erro); }
   })).catch(console.error);
 }
+document.addEventListener('click',e=>{const m=document.getElementById('menuCategorias');if(m?.open && !m.contains(e.target))m.open=false;});
+document.addEventListener('keydown',e=>{const m=document.getElementById('menuCategorias');if(e.key==='Escape'&&m?.open){m.open=false;m.querySelector('summary').focus();}});
 if (busca) busca.addEventListener("input", filtrarProdutos);
+function limparNavegacao() {
+  modoCatalogo = "todas"; categoriaAtual = "Todas"; busca.value = "";
+  desenharCategorias(); filtrarProdutos();
+}
+for (const [id, modo] of [["navCupons","cupons"],["navFavoritos","favoritos"]]) {
+  document.getElementById(id).addEventListener("click", () => {
+    modoCatalogo = modoCatalogo === modo ? "todas" : modo;
+    categoriaAtual = "Todas"; busca.value = "";
+    desenharCategorias(); filtrarProdutos();
+  });
+}
+document.getElementById("navInicio").addEventListener("click", limparNavegacao);
+document.getElementById("limparFiltros").addEventListener("click", limparNavegacao);
+// A miniatura abre o QR em tamanho maior, sem redirecionar o visitante.
+const dialogQR = document.getElementById("qrGrupoDialog");
+document.querySelector(".grupo-qr-ampliar")?.addEventListener("click", () => {
+  if (dialogQR && !dialogQR.open) dialogQR.showModal();
+});
+dialogQR?.addEventListener("click", evento => {
+  if (evento.target === dialogQR) {
+    const r = dialogQR.getBoundingClientRect();
+    if (evento.clientX < r.left || evento.clientX > r.right || evento.clientY < r.top || evento.clientY > r.bottom) dialogQR.close();
+  }
+});
+desenharCategorias(); atualizarNavegacao();
 carregarOfertasPublicadas();

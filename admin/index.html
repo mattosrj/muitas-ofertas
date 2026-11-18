@@ -163,6 +163,12 @@
       .linha { grid-template-columns: 1fr; }
       .acoes button { flex: 1; }
     }
+    [hidden] { display: none !important; }
+    .pendencias { padding: 14px; margin: 16px 0; background: #fef3c7; color: #78350f; border-radius: 8px; }
+    .pendencias button { margin-top: 8px; background: #92400e; }
+    #categoria:not([hidden]) { margin-top: 8px; }
+    .previa-imagem { margin: 12px 0; padding: 12px; border: 1px dashed var(--cor-borda); border-radius: 8px; }
+    .previa-imagem img { display: block; max-width: 100%; width: 180px; height: 160px; object-fit: contain; background: white; border-radius: 6px; }
   </style>
 
   <!-- Usa o MESMO script de tema do site público. Nenhum seletor extra no admin. -->
@@ -193,6 +199,7 @@
         <button id="btn-sair" type="button" class="secundario">Sair</button>
       </div>
 
+      <div id="aviso-pendencias" hidden role="status" class="pendencias"><strong id="texto-pendencias"></strong> <button id="btn-pendentes" type="button">Ver pendentes</button></div>
       <hr>
       <h3 id="titulo-formulario">➕ Cadastrar nova oferta</h3>
 
@@ -221,7 +228,9 @@
           </div>
         </div>
         <label for="categoria">Categoria</label>
-        <input id="categoria" type="text" maxlength="100" placeholder="Ex.: Moda">
+        <select id="categoria-lista"><option value="">Selecione uma categoria</option></select>
+        <input id="categoria" type="text" maxlength="100" placeholder="Digite uma nova categoria" hidden aria-label="Nova categoria ou categoria selecionada">
+        <p class="info">Selecione uma opção ou escolha Nova categoria. Ela será adicionada após salvar.</p>
 
         <label for="link">Link de afiliado</label>
         <input id="link" type="url" placeholder="https://..." required>
@@ -231,7 +240,8 @@
         <p class="info">Deixe em branco se a oferta não tiver cupom.</p>
         <label for="imagem">URL da imagem (opcional)</label>
         <input id="imagem" type="url" placeholder="https://...">
-        <p class="info">A imagem poderá ser obtida automaticamente em uma próxima etapa.</p>
+        <p class="info">A busca começa automaticamente ao colar o link de afiliado. Se não encontrar, cole uma URL de imagem autorizada acima.</p>
+        <div class="previa-imagem"><img id="imagem-previa" alt="Prévia da foto do produto" hidden><p id="imagem-status" class="info" role="status">Aguardando link de afiliado.</p></div>
 
         <button id="btn-salvar" type="submit" class="botao-largo">Salvar oferta</button>
         <button id="btn-cancelar" type="button" class="secundario botao-largo">Cancelar edição</button>
