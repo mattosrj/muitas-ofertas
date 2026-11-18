@@ -21,6 +21,69 @@ const botaoSalvar = $("btn-salvar");
 
 let ofertas = [];
 let produtoEmEdicao = null;
+let somentePendentes = false;
+let buscaImagemSeq = 0, timerImagem, controleImagem, imagemAuto = '';
+const CATEGORIAS_BASE = ['Eletrônicos','Smartphones','Moda e Acessórios','Casa e Decoração','Informática','Casa'];
+const NOVA_CATEGORIA = '__nova__';
+function atualizarCategorias() {
+  const select = $('categoria-lista'), valor = $('categoria').value.trim();
+  const nomes = [...new Set([...CATEGORIAS_BASE, ...ofertas.map(p => (p.categoria || '').trim()).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  select.replaceChildren(new Option('Selecione uma categoria',''), ...nomes.map(n => new Option(n,n)), new Option('+ Nova categoria',NOVA_CATEGORIA));
+  select.value = nomes.includes(valor) ? valor : valor ? NOVA_CATEGORIA : '';
+  $('categoria').hidden = select.value !== NOVA_CATEGORIA;
+}
+$('categoria-lista').addEventListener('change',()=>{
+  const valor = $('categoria-lista').value;
+  $('categoria').value = valor === NOVA_CATEGORIA ? '' : valor;
+  $('categoria').hidden = valor !== NOVA_CATEGORIA;
+  if (! $('categoria').hidden) $('categoria').focus();
+});
+function atualizarPendencias() {
+  const total = ofertas.filter(p=>!p.publicado).length;
+  $('aviso-pendencias').hidden = total === 0 && !somentePendentes;
+  $('texto-pendencias').textContent = total === 1 ? 'Você tem 1 oferta aguardando publicação.' : `Você tem ${total} ofertas aguardando publicação.`;
+  $('btn-pendentes').textContent = somentePendentes ? 'Ver todas' : 'Ver pendentes';
+}
+$('btn-pendentes').addEventListener('click',()=>{ somentePendentes=!somentePendentes; atualizarPendencias(); filtrarOfertas(); $('status-lista').scrollIntoView({block:'center',behavior:'smooth'}); });
+function cancelarBuscaImagem() { ++buscaImagemSeq; clearTimeout(timerImagem); controleImagem?.abort(); }
+function mostrarPrevia(url, seq=buscaImagemSeq) {
+  const foto=$('imagem-previa'), status=$('imagem-status');
+  foto.hidden=true; foto.removeAttribute('src'); foto.onload=null; foto.onerror=null;
+  if (!url) { status.textContent='Aguardando imagem.'; return; }
+  try { url=validarUrl(url); } catch { status.textContent='Informe uma URL HTTPS válida.'; return; }
+  status.textContent='Carregando prévia da imagem...';
+  foto.referrerPolicy='no-referrer';
+  foto.onload=()=>{ if(seq===buscaImagemSeq){foto.hidden=false;status.textContent='Imagem carregada. Confira antes de salvar.';} };
+  foto.onerror=()=>{ if(seq===buscaImagemSeq){foto.hidden=true;status.textContent='Não foi possível abrir a imagem. Informe outra URL autorizada.';} };
+  foto.src=url;
+}
+async function buscarImagem(seq, link) {
+  if(seq!==buscaImagemSeq) return;
+  const status=$('imagem-status'); status.textContent='Buscando imagem do produto...';
+  const ctrl=new AbortController(); controleImagem=ctrl;
+  const prazo=setTimeout(()=>ctrl.abort(),12000);
+  try {
+    const r=await fetch('https://muitas-ofertas-imagens.mattosde.workers.dev/?url='+encodeURIComponent(link),{signal:ctrl.signal});
+    const dados=await r.json();
+    if(seq!==buscaImagemSeq) return;
+    if(!r.ok || !dados.sucesso || !dados.imagem) throw new Error(dados.erro || dados.mensagem || 'Imagem não localizada');
+    const url=validarUrl(dados.imagem);
+    imagemAuto=url; $('imagem').value=url; mostrarPrevia(url,seq);
+  } catch(erro) { if(seq===buscaImagemSeq) status.textContent='Não foi possível buscar automaticamente. Cole a URL da imagem. '+(erro.name==='AbortError'?'Tempo de consulta esgotado.':erro.message); }
+  finally {clearTimeout(prazo);}
+}
+function agendarImagem(){
+  cancelarBuscaImagem();
+  // Ao trocar o link, não reutilizar a imagem de outro produto.
+  $('imagem').value=''; imagemAuto=''; mostrarPrevia('');
+  let link; try {link=validarUrl($('link').value);} catch {return;}
+  const seq=buscaImagemSeq;
+  $('imagem-status').textContent='Aguardando busca automática...';
+  timerImagem=setTimeout(()=>buscarImagem(seq,link),450);
+}
+$('link').addEventListener('input',agendarImagem);
+$('imagem').addEventListener('input',()=>{cancelarBuscaImagem(); imagemAuto=''; mostrarPrevia($('imagem').value);});
+atualizarCategorias();
 
 const moeda = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -157,7 +220,9 @@ function validarUrl(valor) {
 // VOLTAR AO MODO CADASTRO
 function limparEdicao() {
   produtoEmEdicao = null;
+  cancelarBuscaImagem(); imagemAuto='';
   formularioProduto.reset();
+  atualizarCategorias(); mostrarPrevia('');
 
   $("titulo-formulario").textContent =
     "➕ Cadastrar nova oferta";
@@ -177,8 +242,12 @@ function editarProduto(produto) {
     .toFixed(2).replace(".", ",");
   $("loja").value = produto.loja;
   $("categoria").value = produto.categoria || "";
+  atualizarCategorias();
   $("link").value = produto.link;
+  cancelarBuscaImagem(); imagemAuto='';
   $("imagem").value = produto.imagem || "";
+  if (produto.imagem) mostrarPrevia(produto.imagem);
+  else { mostrarPrevia(''); const seq=buscaImagemSeq; try { buscarImagem(seq,validarUrl(produto.link)); } catch {} }
   $("codigo-cupom").value = produto.codigo_cupom || "";
 
   $("titulo-formulario").textContent =
@@ -210,6 +279,7 @@ formularioProduto.addEventListener(
   async (evento) => {
     evento.preventDefault();
 
+    cancelarBuscaImagem();
     botaoSalvar.disabled = true;
     informar($("resultado"), "Salvando...");
 
@@ -468,6 +538,7 @@ async function carregarOfertas() {
   }
 
   ofertas = data || [];
+  atualizarCategorias(); atualizarPendencias();
 
   status.textContent = ofertas.length
     ? `${ofertas.length} oferta(s) cadastrada(s)`
@@ -492,7 +563,7 @@ $("btn-sair").addEventListener("click", async () => {
     return;
   }
 
-  ofertas = [];
+  ofertas = []; somentePendentes=false; atualizarPendencias();
   $("lista-produtos").replaceChildren();
   $("status-lista").textContent = "";
 
@@ -541,7 +612,7 @@ function filtrarOfertas() {
       .join(" ")
       .toLocaleLowerCase("pt-BR");
 
-    return conteudo.includes(termo);
+    return (!somentePendentes || !produto.publicado) && conteudo.includes(termo);
   });
 
   const lista = $("lista-produtos");

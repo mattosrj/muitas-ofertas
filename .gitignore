@@ -2,3 +2,9 @@
 .muitas-ofertas-backup/
 /pacote/
 /pacote-muitas-ofertas/
+
+/atualizacao-*/
+/melhorias-*/
+/pacote-*/
+/*.zip
+/__pycache__/

@@ -24,11 +24,15 @@
   <!-- CABEÇALHO -->
   <header class="topo">
     <div class="container topo-conteudo">
-      <div class="topo-texto">
-        <h1>🔥 Muitas Ofertas</h1>
+      <!-- MO-LAYOUT-COMPACTO-2026-11-18 -->
+      <div class="topo-marca"><div class="topo-texto">
+        <h1><button type="button" id="navInicio" class="marca-inicio">🔥 Muitas Ofertas</button></h1>
         <p>As melhores oportunidades para economizar!</p>
       </div>
 
+      <!-- MO-NAVEGACAO-2026-11-18 -->
+      
+      
       <!-- Aparece apenas no computador. title mostra a legenda ao passar o mouse. -->
       <div class="tema-controle" role="group" aria-label="Escolher tema">
         <button class="tema-botao" type="button" data-tema="light"
@@ -51,31 +55,46 @@
           </svg>
         </button>
       </div>
+      </div>
+      <div class="topo-navegacao">
+        <nav class="navegacao-loja" aria-label="Navegação principal">
+        <button id="navCupons" class="nav-item" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4zM15 7v2m0 3v1m0 2v2"/></svg> Cupons</button>
+        <details id="menuCategorias">
+          <summary class="nav-item"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Categorias <span aria-hidden="true">⌄</span></summary>
+          <div class="menu-categorias-painel">
+            <p class="menu-categorias-titulo">Selecione uma categoria</p>
+            <div id="listaCategorias" aria-label="Filtrar por categoria"></div>
+          </div>
+        </details>
+        <button id="navFavoritos" class="nav-item" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 8.6c0 4.4-8.8 9.9-8.8 9.9S3.2 13 3.2 8.6a4.6 4.6 0 0 1 8.8-2 4.6 4.6 0 0 1 8.8 2z"/></svg> Meus favoritos</button>
+      </nav>
+        <div class="busca-header" role="search">
+        <input type="search" id="campoBusca" placeholder="Buscar oferta" aria-label="Pesquisar produtos">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg></div>
+      </div>
     </div>
   </header>
 
   <!-- CONTEÚDO PRINCIPAL: mesmos IDs usados pelo JavaScript dos produtos. -->
-  <main class="container">
-    <section class="busca" aria-label="Pesquisar produtos">
-      <input type="search" id="campoBusca"
-             placeholder="O que você está procurando?"
-             aria-label="Pesquisar produtos">
-    </section>
-
-    <section class="categorias">
-      <h2>Categorias</h2>
-      <div id="listaCategorias">
-        <button class="categoria ativa" data-categoria="Todas">Todas</button>
-        <button class="categoria" data-categoria="Eletrônicos">Eletrônicos</button>
-        <button class="categoria" data-categoria="Casa">Casa</button>
-        <button class="categoria" data-categoria="Informática">Informática</button>
-      </div>
-    </section>
+  <main class="container layout-com-lateral">
 
     <section class="ofertas">
-      <h2>🔥 Ofertas em destaque</h2>
+      <div class="filtro-atual" id="filtroAtual" hidden><span id="categoriaSelecionada">Todas</span><button id="limparFiltros" type="button">Limpar filtros ×</button></div>
+      <h2 id="tituloOfertas">🔥 Ofertas em destaque</h2>
       <div id="listaProdutos" class="produtos"></div>
     </section>
+    <aside class="grupo-lateral" aria-label="Grupo do WhatsApp">
+      <section class="grupo-painel">
+        <h2>Grupo de Ofertas</h2>
+        <p class="grupo-subtitulo">Entre no grupo e receba promoções imperdíveis!</p>
+        <div class="grupo-instrucoes">
+          <ol><li><span>1</span> Escaneie o QR code.</li><li><span>2</span> Abra o convite e entre no grupo.</li></ol>
+          <button class="grupo-qr-ampliar" type="button" aria-label="Ampliar QR code" aria-haspopup="dialog"><img src="images/qr-grupo-whatsapp.png" width="112" height="112" alt="QR code do grupo Muitas Ofertas"></button>
+        </div>
+        <p class="grupo-ou">Ou clique no botão abaixo</p>
+        <a class="grupo-entrar" href="https://chat.whatsapp.com/INzksZxXmzF7dMv0bxS2wk?s=cl&amp;p=a&amp;iam=2" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/><path d="M8.8 8.3c.8 3 3 5.2 6 6l1.1-1.2"/></svg> Entrar no grupo</a>
+      </section>
+    </aside>
   </main>
 
   <!-- AVISO DISCRETO, LOGO ACIMA DO RODAPÉ -->
@@ -97,5 +116,10 @@
   <!-- Mantemos o script original dos produtos. -->
   <script type="module" src="js/script.js"></script>
   <script src="js/tema.js"></script>
+  <dialog id="qrGrupoDialog" class="grupo-qr-dialog" aria-labelledby="qrGrupoTitulo">
+    <h2 id="qrGrupoTitulo">Escaneie para entrar no grupo</h2>
+    <img src="images/qr-grupo-whatsapp.png" alt="QR code ampliado do Muitas Ofertas">
+    <form method="dialog"><button type="submit">Fechar</button></form>
+  </dialog>
 </body>
 </html>
