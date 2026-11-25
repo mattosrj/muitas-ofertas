@@ -474,3 +474,9 @@ main.layout-com-lateral .produto { min-width:0; padding:14px; }
   header.topo .navegacao-loja { gap:5px; }
   header.topo .nav-item, header.topo #menuCategorias summary.nav-item { font-size:10px; }
 }
+
+/* MO-CUPONS-CAMPANHAS-2026-11-25: acesso à vitrine pública de cupons. */
+header.topo .navegacao-loja a.mo-campanhas-nav {text-decoration:none}
+@media(max-width:680px) {
+  header.topo .navegacao-loja {flex-wrap:wrap;justify-content:flex-start;column-gap:14px;row-gap:3px}
+}
