@@ -1,0 +1,41 @@
+:root{color-scheme:light;--fundo:#f3f5f9;--card:#fff;--texto:#172033;--sec:#526071;--borda:#dce2ea;--campo:#fff;--destaque:#166534}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){color-scheme:dark;--fundo:#10151d;--card:#1c2532;--texto:#f1f5f9;--sec:#aab7c8;--borda:#344154;--campo:#263142;--destaque:#6ee7a2}}
+:root[data-theme=dark]{color-scheme:dark;--fundo:#10151d;--card:#1c2532;--texto:#f1f5f9;--sec:#aab7c8;--borda:#344154;--campo:#263142;--destaque:#6ee7a2}
+[hidden]{display:none!important}*{box-sizing:border-box}body{font:16px/1.5 Arial,sans-serif;background:var(--fundo);color:var(--texto);margin:0}a{color:var(--destaque)}
+.container{max-width:980px;width:94%;margin:30px auto 55px}.pagina-topo{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px}.marca{font-weight:bold;color:var(--destaque)}h1{margin:5px 0 0;font-size:28px}h2{font-size:21px;margin:0 0 15px}h3{font-size:17px;margin:0}.muted{color:var(--sec)}.pequeno{font-size:13px}.link-voltar{white-space:nowrap}.cartao{background:var(--card);border:1px solid var(--borda);border-radius:12px;padding:24px;margin:20px 0;box-shadow:0 3px 12px #00000012}label{display:block;font-weight:bold;margin:15px 0 6px}input,select,textarea{display:block;width:100%;padding:11px 12px;font:inherit;color:var(--texto);background:var(--campo);border:1px solid var(--borda);border-radius:7px}textarea{resize:vertical}.duas-colunas{display:grid;grid-template-columns:1fr 1fr;gap:16px}.linha-titulo{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:24px 0 12px}.linha-titulo h2{margin:0}.acoes-form,.acoes{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.botao{padding:10px 14px;border:0;border-radius:7px;font-weight:bold;cursor:pointer;font:inherit}.botao.principal{background:#166534;color:white}.botao.secundario{background:#374151;color:#fff}.botao:disabled{opacity:.6;cursor:wait}.botao:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid #e4b600;outline-offset:2px}.item-form{border:1px dashed var(--borda);border-radius:10px;padding:15px;margin:12px 0}.item-form .duas-colunas{gap:12px}.item-form .remover{background:#77343b;color:white}.aviso{border-radius:8px;padding:12px 15px;margin:14px 0}.aviso.sucesso{background:#dcfce7;color:#166534}.aviso.erro{background:#fee2e2;color:#991b1b}.aviso.info{background:#e0f2fe;color:#075985}#resultado-cupons:empty{display:none}.filtros{margin-bottom:18px}.campanha-card{padding:18px 0;border-bottom:1px solid var(--borda)}.campanha-card:last-child{border-bottom:0}.campanha-card h3{margin:0 0 6px}.campanha-card p{margin:5px 0}.campanha-card .estado{font-weight:bold}.campanha-card .estado.ativo{color:var(--destaque)}.campanha-card ul{margin:8px 0;padding-left:20px}.campanha-card li{overflow-wrap:anywhere}.campanha-card .acoes{margin-top:10px}.vazio{padding:20px;text-align:center;color:var(--sec)}
+@media(max-width:690px){.container{margin:12px auto 30px}.pagina-topo{align-items:flex-start;flex-direction:column}.cartao{padding:17px}.duas-colunas{grid-template-columns:1fr;gap:0}.filtros{gap:10px}.linha-titulo{align-items:flex-start}.botao{width:auto}h1{font-size:24px}}
+
+/* Compartilhamento do WhatsApp usa link, não envio automático. */
+.acoes a.botao {display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.acoes a.botao:hover {filter:brightness(1.1)}
+
+
+/* Melhorias para explicar o cadastro e usar imagem padrão por campanha. */
+.ajuda-campo {margin:5px 0 10px;line-height:1.5;font-weight:normal}
+.imagem-previa-cupom {display:flex;align-items:center;gap:12px;margin-top:12px;padding:9px;border:1px dashed var(--borda);border-radius:9px;background:var(--campo)}
+.imagem-previa-cupom img {width:180px;height:110px;object-fit:contain;border-radius:7px;background:#131922;flex-shrink:0;padding:6px}
+.imagem-previa-cupom span {overflow-wrap:anywhere}
+.exemplo-cadastro {margin:18px 0;padding:13px;border:1px solid var(--borda);border-radius:9px}
+.exemplo-cadastro summary {font-weight:bold;cursor:pointer}
+.exemplo-cadastro p {margin:8px 0;font-size:14px}
+.campanha-card::after {content:"";display:block;clear:both}
+.campanha-imagem {float:left;width:150px;height:92px;object-fit:contain;margin:2px 15px 11px 0;border-radius:9px;background:#131922;padding:6px}
+@media(max-width:420px){.campanha-imagem{width:108px;height:70px;margin-right:10px;padding:4px}.imagem-previa-cupom img{width:120px;height:78px;padding:4px}}
+
+/* Campanhas: prévia da postagem e imagens próprias para cada loja. */
+.imagem-previa-cupom img{width:180px;height:110px;object-fit:contain;background:#131922;padding:6px}
+.campanha-imagem{width:150px;height:92px;object-fit:contain;padding:6px}
+.previa-postagem{margin:24px 0 8px;padding:18px;border:1px solid var(--borda);border-radius:10px;background:var(--fundo)}
+.previa-postagem h3{margin-bottom:4px}
+.texto-postagem{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.65 Arial,sans-serif;padding:16px;background:var(--card);border:1px solid var(--borda);border-radius:8px;max-height:390px;overflow:auto}
+.previa-postagem .acoes{margin-top:12px}
+.campanha-card .acoes a.botao{white-space:normal}
+@media(max-width:600px){.imagem-previa-cupom img{width:140px;height:88px;padding:4px}.campanha-imagem{width:118px;height:76px;padding:4px}}
+
+.observacoes-admin{white-space:pre-line;line-height:1.6}
+
+/* v3: cartões de campanha e prévias, sem recorte das imagens */
+.imagem-previa-cupom img{width:150px;height:150px;object-fit:contain;border-radius:8px;background:#10151d;padding:0;flex-shrink:0}
+.campanha-imagem{width:142px;height:142px;object-fit:contain;border-radius:9px;background:#10151d;padding:0}
+.observacoes-admin{white-space:pre-line;line-height:1.65;overflow-wrap:anywhere}
+@media(max-width:600px){.imagem-previa-cupom img{width:106px;height:106px}.campanha-imagem{width:106px;height:106px}}
