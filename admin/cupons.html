@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Gerenciar cupons | Muitas Ofertas</title>
+  <link rel="icon" href="../images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="../css/cupons-admin.css?v=20261125v3">
+  <script defer src="../js/tema.js"></script>
+</head>
+<body>
+<main class="container">
+  <header class="pagina-topo">
+    <div>
+      <p class="marca">🔥 Muitas Ofertas</p>
+      <h1>🎟️ Campanhas de cupons</h1>
+      <p class="muted">Cadastre campanhas com vários cupons. Salvar não publica automaticamente.</p>
+    </div>
+    <a href="./index.html" class="link-voltar">← Voltar às ofertas</a>
+  </header>
+
+  <div id="aviso-sessao" class="aviso erro" role="alert" hidden>
+    Para gerenciar cupons, faça login como administrador no painel de ofertas.
+    <a href="./index.html">Acessar painel</a>
+  </div>
+
+  <section id="painel-cupons" hidden>
+    <div id="resultado-cupons" role="status" aria-live="polite"></div>
+    <section class="cartao">
+      <h2 id="titulo-formulario">➕ Nova campanha</h2>
+      <form id="form-campanha">
+        <div class="duas-colunas">
+          <div><label for="titulo">Título da campanha (opcional)</label><input id="titulo" maxlength="180" placeholder="Em branco, geramos o título pela loja"></div>
+          <div><label for="loja-cupom">Loja *</label>
+            <select id="loja-cupom" required>
+              <option value="">Selecione</option><option>Mercado Livre</option><option>Amazon</option>
+              <option>Shopee</option><option>Magalu</option><option>AliExpress</option>
+              <option value="Outra">Outra loja</option>
+            </select>
+          </div>
+        </div>
+        <label for="outra-loja">Nome da loja (quando escolher “Outra loja”)</label>
+        <input id="outra-loja" maxlength="80" placeholder="Nome da loja" hidden>
+        <label for="ativacao">Link de ativação geral (opcional)</label>
+        <input id="ativacao" type="url" placeholder="https://..." aria-describedby="ajuda-ativacao">
+        <p id="ajuda-ativacao" class="muted pequeno ajuda-campo">Deixe em branco se os cupons já tiverem links próprios, ou se a loja só oferecer códigos. É o link da loja, não do site Muitas Ofertas.</p>
+        <div class="duas-colunas">
+          <div><label for="imagem">URL da imagem (opcional)</label><input id="imagem" type="url" placeholder="https://..." aria-describedby="ajuda-imagem"><p id="ajuda-imagem" class="muted pequeno ajuda-campo">Pode deixar em branco. A imagem padrão da loja selecionada aparecerá automaticamente. Se usar outra, informe a URL direta da foto.</p><div class="imagem-previa-cupom"><img id="imagem-previa-cupom" src="../images/cupom-generico.png" alt="Imagem ilustrativa da campanha de cupons"><span id="texto-imagem-previa" class="muted pequeno">Imagem padrão por loja</span></div></div>
+          <div><label for="validade">Validade, se informada pela loja</label><input id="validade" type="date"></div>
+        </div>
+        <label for="destaque">Destaque (opcional)</label>
+        <input id="destaque" maxlength="250" placeholder="Ex.: FRETE GRÁTIS ACIMA DE R$19">
+        <label for="observacoes">Condições e observações (opcional)</label>
+        <textarea id="observacoes" rows="3" maxlength="1600" placeholder="Ex.: Verifique condições e elegibilidade no aplicativo da loja."></textarea>
+        <details class="exemplo-cadastro">
+          <summary>💡 Ver um exemplo de preenchimento</summary>
+          <p><strong>Título:</strong> em branco → sistema cria “LISTA DE CUPONS MERCADO LIVRE”, caso tenha vários códigos.</p>
+          <p><strong>Loja:</strong> Mercado Livre</p>
+          <p><strong>Link geral:</strong> opcional. Pode usar links individuais para cada código.</p>
+          <p><strong>Destaque:</strong> Frete grátis acima de R$ 19 (somente se for uma condição válida)</p>
+          <p><strong>Primeiro código:</strong> ESPORTE10 — <strong>Descrição:</strong> 10% OFF acima de R$ 89, até R$ 40</p>
+          <p><strong>Segundo código:</strong> MODA15 — <strong>Descrição:</strong> 15% OFF em itens selecionados</p>
+          <p class="muted pequeno">São exemplos fictícios. Confira sempre os códigos e as regras reais antes de publicar.</p>
+        </details>
+        <div id="lista-codigos-titulo" class="linha-titulo">
+          <h3>Cupons desta campanha</h3>
+          <button id="adicionar-item" type="button" class="botao secundario">+ Adicionar cupom</button>
+        </div>
+        <div id="itens-form" aria-label="Cupons da campanha"></div>
+        <p class="muted pequeno">Em cada cupom, só a <strong>descrição/desconto é obrigatória</strong>. Código e link individual são opcionais. Se não houver nenhum link, a mensagem não mostrará “Resgate aqui”.</p>
+        <section class="previa-postagem" aria-label="Prévia da mensagem de divulgação"><h3>📲 Prévia da mensagem do WhatsApp</h3><p class="muted pequeno">A mensagem muda conforme você preenche. A imagem acima será usada na postagem.</p><pre id="texto-previa-postagem" class="texto-postagem"></pre><div class="acoes"><button type="button" id="copiar-previa" class="botao secundario">📋 Copiar mensagem</button><button type="button" id="baixar-previa" class="botao secundario">🖼️ Baixar imagem</button><button type="button" id="compartilhar-previa" class="botao principal">📲 Compartilhar imagem + texto</button></div><p class="muted pequeno">Compartilhamento depende do celular/navegador: confirme a mensagem e a foto no WhatsApp antes de enviar. No computador, pode ser necessário anexar a foto manualmente.</p></section>
+        <div class="acoes-form">
+          <button id="salvar" type="submit" class="botao principal">Salvar rascunho / alterações</button>
+          <button id="cancelar" type="button" class="botao secundario" hidden>Cancelar edição</button>
+        </div>
+      </form>
+    </section>
+    <section class="cartao">
+      <div class="linha-titulo"><h2>Campanhas cadastradas</h2><button id="atualizar" type="button" class="botao secundario">Atualizar lista</button></div>
+      <p id="contador" class="muted" role="status">Carregando campanhas...</p>
+      <div class="duas-colunas filtros">
+        <input id="pesquisar" type="search" aria-label="Pesquisar campanhas" placeholder="Buscar campanha, loja ou código...">
+        <select id="filtro-publicacao" aria-label="Filtrar publicação">
+          <option value="todas">Todas</option><option value="rascunhos">Rascunhos</option><option value="publicadas">Publicadas</option>
+        </select>
+      </div>
+      <div id="lista-campanhas"></div>
+    </section>
+  </section>
+</main>
+<script type="module" src="./cupons.js?v=20261125v3"></script>
+</body>
+</html>

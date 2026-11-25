@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cupons e campanhas de descontos selecionados pelo Muitas Ofertas.">
+  <title>Cupons | Muitas Ofertas</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <script>
+    try {
+      const t = localStorage.getItem('muitas-ofertas-tema');
+      if (matchMedia('(min-width: 769px)').matches && (t==='dark'||t==='light'))
+        document.documentElement.dataset.theme=t;
+    }catch{}
+  </script>
+  <link rel="stylesheet" href="css/cupons.css?v=20261125v3">
+  <!-- Correção v3: preserva a imagem quadrada inteira em todas as larguras. -->
+  <style>
+    .cartao-imagem { aspect-ratio: 1 / 1 !important; width: 100% !important; height: auto !important;
+      object-fit: contain !important; padding: 0 !important; background: #10151d !important; }
+    .condicoes { white-space: pre-line; }
+  </style>
+  <script defer src="js/tema.js"></script>
+</head>
+<body>
+  <header class="cabecalho">
+    <div class="limite cabecalho-linha">
+      <a class="marca" href="index.html">🔥 Muitas Ofertas</a>
+      <nav aria-label="Navegação do site">
+        <a href="index.html">🛍️ Ofertas</a>
+        <a href="cupons.html" aria-current="page">🎟️ Cupons</a>
+      </nav>
+    </div>
+  </header>
+  <main class="limite">
+    <div class="introducao">
+      <div><h1>🎟️ Cupons de desconto</h1><p>Encontre códigos e links de ativação das campanhas publicadas.</p></div>
+      <a class="grupo" href="https://chat.whatsapp.com/INzksZxXmzF7dMv0bxS2wk?s=cl&amp;p=a&amp;iam=2" target="_blank" rel="noopener noreferrer">Receber ofertas no WhatsApp</a>
+    </div>
+    <div class="filtros" role="search">
+      <label>Pesquisar cupom<input type="search" id="buscar-cupom" placeholder="Loja, desconto ou código..."></label>
+      <label>Loja<select id="filtrar-loja"><option value="">Todas as lojas</option></select></label>
+    </div>
+    <p id="status-cupons" role="status" aria-live="polite">Carregando campanhas...</p>
+    <section id="lista-cupons" class="grade" aria-label="Campanhas de cupons"></section>
+    <p class="aviso">ℹ️ Os cupons e condições são fornecidos pelas lojas e podem mudar sem aviso. Confira todas as regras antes de utilizar. #publi — Alguns links podem gerar comissão para o Muitas Ofertas.</p>
+  </main>
+  <footer>© 2026 Muitas Ofertas — Encontre sua próxima economia.</footer>
+  <script type="module" src="js/cupons.js?v=20261125v3"></script>
+</body>
+</html>

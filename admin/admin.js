@@ -503,7 +503,23 @@ function criarCard(produto) {
     }
   });
 
-  acoes.append(botaoEditar, botaoWhatsApp, botaoPublicar);
+  // MO-ADMIN-WHATSAPP-GRUPO-2026
+  // O link abre a tela de compartilhamento, sem enviar automaticamente.
+  const enviarAoGrupo = document.createElement("button");
+  enviarAoGrupo.type = "button";
+  enviarAoGrupo.className = "secundario";
+  enviarAoGrupo.textContent = "📲 Abrir no WhatsApp";
+  enviarAoGrupo.title = produto.publicado
+    ? "Selecione o grupo Muitas Ofertas e confirme o envio no WhatsApp"
+    : "Publique a oferta antes de divulgá-la no grupo";
+  enviarAoGrupo.disabled = !produto.publicado;
+  enviarAoGrupo.addEventListener("click", () => {
+    // O navegador não tem permissão para enviar diretamente ao grupo existente.
+    const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(gerarMensagem(produto));
+    window.open(url, "_blank", "noopener,noreferrer");
+  });
+
+  acoes.append(botaoEditar, botaoWhatsApp, botaoPublicar, enviarAoGrupo);
 
   card.append(nome, preco);
   if (produto.codigo_cupom) {
