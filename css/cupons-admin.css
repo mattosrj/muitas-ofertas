@@ -39,3 +39,14 @@
 .campanha-imagem{width:142px;height:142px;object-fit:contain;border-radius:9px;background:#10151d;padding:0}
 .observacoes-admin{white-space:pre-line;line-height:1.65;overflow-wrap:anywhere}
 @media(max-width:600px){.imagem-previa-cupom img{width:106px;height:106px}.campanha-imagem{width:106px;height:106px}}
+
+/* v4: exclusão e alerta de código duplicado */
+.aviso-duplicidade-cupom{padding:11px 13px;margin:10px 0;border-radius:8px;border:1px solid #d97706;background:#fffbeb;color:#92400e;overflow-wrap:anywhere;font-size:13px}
+:root[data-theme=dark] .aviso-duplicidade-cupom{background:#3f2a12;color:#fde68a}
+.botao.perigo{background:#9f1239;color:#fff}
+
+/* v5: avisos flutuantes não mudam a posição de rolagem do Admin. */
+#resultado-cupons:not(:empty){position:fixed;right:18px;bottom:18px;top:auto;z-index:3000;
+  width:min(420px,calc(100vw - 36px));box-shadow:0 12px 32px #0007;margin:0;
+  border:1px solid var(--borda);font-weight:600;pointer-events:none}
+#ordenacao-campanhas{max-width:360px;margin:0 0 16px}

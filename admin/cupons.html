@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Gerenciar cupons | Muitas Ofertas</title>
   <link rel="icon" href="../images/favicon.png" type="image/png">
-  <link rel="stylesheet" href="../css/cupons-admin.css?v=20261125v3">
+  <link rel="stylesheet" href="../css/cupons-admin.css?v=20261126v5">
   <script defer src="../js/tema.js"></script>
 </head>
 <body>
@@ -68,6 +68,7 @@
           <button id="adicionar-item" type="button" class="botao secundario">+ Adicionar cupom</button>
         </div>
         <div id="itens-form" aria-label="Cupons da campanha"></div>
+        <p id="aviso-duplicidade-cupom" class="aviso-duplicidade-cupom" role="status" aria-live="polite" hidden></p>
         <p class="muted pequeno">Em cada cupom, só a <strong>descrição/desconto é obrigatória</strong>. Código e link individual são opcionais. Se não houver nenhum link, a mensagem não mostrará “Resgate aqui”.</p>
         <section class="previa-postagem" aria-label="Prévia da mensagem de divulgação"><h3>📲 Prévia da mensagem do WhatsApp</h3><p class="muted pequeno">A mensagem muda conforme você preenche. A imagem acima será usada na postagem.</p><pre id="texto-previa-postagem" class="texto-postagem"></pre><div class="acoes"><button type="button" id="copiar-previa" class="botao secundario">📋 Copiar mensagem</button><button type="button" id="baixar-previa" class="botao secundario">🖼️ Baixar imagem</button><button type="button" id="compartilhar-previa" class="botao principal">📲 Compartilhar imagem + texto</button></div><p class="muted pequeno">Compartilhamento depende do celular/navegador: confirme a mensagem e a foto no WhatsApp antes de enviar. No computador, pode ser necessário anexar a foto manualmente.</p></section>
         <div class="acoes-form">
@@ -85,10 +86,16 @@
           <option value="todas">Todas</option><option value="rascunhos">Rascunhos</option><option value="publicadas">Publicadas</option>
         </select>
       </div>
+      <label for="ordenacao-campanhas">Ordenar campanhas por data de publicação</label>
+      <select id="ordenacao-campanhas">
+        <option value="recentes">Publicação mais recente</option>
+        <option value="antigas">Publicação mais antiga</option>
+        <option value="cadastro">Cadastro mais recente</option>
+      </select>
       <div id="lista-campanhas"></div>
     </section>
   </section>
 </main>
-<script type="module" src="./cupons.js?v=20261125v3"></script>
+<script type="module" src="./cupons.js?v=20261126v5"></script>
 </body>
 </html>

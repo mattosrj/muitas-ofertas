@@ -169,6 +169,17 @@
     #categoria:not([hidden]) { margin-top: 8px; }
     .previa-imagem { margin: 12px 0; padding: 12px; border: 1px dashed var(--cor-borda); border-radius: 8px; }
     .previa-imagem img { display: block; max-width: 100%; width: 180px; height: 160px; object-fit: contain; background: white; border-radius: 6px; }
+    .aviso-duplicidade{padding:10px 12px;margin:7px 0 12px;border-radius:8px;border:1px solid #d97706;color:#92400e;background:#fffbeb;font-size:13px;overflow-wrap:anywhere}
+    :root[data-theme=dark] .aviso-duplicidade{color:#fde68a;background:#3f2a12}
+    .gestao-categorias{border:1px solid var(--cor-borda);padding:18px;border-radius:10px;margin:22px 0;background:var(--cor-card)}
+    .gestao-categorias h3{margin-top:0}.acao-perigosa{background:#9f1239;color:white}
+    .preco-antigo-admin{font-size:14px;color:var(--cor-texto-secundario);margin:6px 0 0}
+    .preco-antigo-admin del{text-decoration:line-through;opacity:.8}
+    .acesso-arquivo{margin:14px 0;padding:12px;border:1px solid var(--cor-borda);border-radius:9px}
+    .link-arquivo{color:var(--cor-preco);font-weight:bold;text-decoration:none}
+    .link-arquivo:hover{text-decoration:underline}
+    .data-publicacao-admin{color:var(--cor-texto-secundario);font-size:13px;margin:8px 0}
+    #ordenacao-ofertas{margin-bottom:12px}
   </style>
 
   <!-- Usa o MESMO script de tema do site público. Nenhum seletor extra no admin. -->
@@ -202,6 +213,10 @@
             <div id="atalho-campanhas-cupons" style="margin:15px 0">
         <a href="./cupons.html" style="display:inline-block;padding:12px 16px;border-radius:7px;background:#166534;color:#fff;text-decoration:none;font-weight:bold">🎟️ Gerenciar campanhas de cupons</a>
       </div>
+      <div class="acesso-arquivo">
+        <a href="./fora-do-ar.html" class="link-arquivo">📦 Publicações fora do ar <strong id="contador-fora-do-ar">(0)</strong></a>
+        <p class="info">Ofertas encerradas ficam guardadas para consulta e exclusão em lote.</p>
+      </div>
       <div id="aviso-pendencias" hidden role="status" class="pendencias"><strong id="texto-pendencias"></strong> <button id="btn-pendentes" type="button">Ver pendentes</button></div>
       <hr>
       <h3 id="titulo-formulario">➕ Cadastrar nova oferta</h3>
@@ -213,10 +228,14 @@
       <form id="form-produto">
         <label for="nome">Nome do produto</label>
         <input id="nome" type="text" maxlength="250" required>
+        <p id="aviso-duplicidade-produto" class="aviso-duplicidade" role="status" aria-live="polite" hidden></p>
         <div class="linha">
           <div>
             <label for="preco">Preço (R$)</label>
             <input id="preco" type="text" inputmode="decimal" placeholder="228,00" required>
+            <label for="preco-anterior">Preço anterior (opcional, R$)</label>
+            <input id="preco-anterior" type="text" inputmode="decimal" placeholder="50,00" aria-describedby="ajuda-preco-anterior">
+            <p id="ajuda-preco-anterior" class="info">Se informado, deve ser maior que o preço atual.</p>
           </div>
           <div>
             <label for="loja">Loja</label>
@@ -234,6 +253,7 @@
         <select id="categoria-lista"><option value="">Selecione uma categoria</option></select>
         <input id="categoria" type="text" maxlength="100" placeholder="Digite uma nova categoria" hidden aria-label="Nova categoria ou categoria selecionada">
         <p class="info">Selecione uma opção ou escolha Nova categoria. Ela será adicionada após salvar.</p>
+        <p id="aviso-categoria-duplicada" class="aviso-duplicidade" role="status" aria-live="polite" hidden></p>
 
         <label for="link">Link de afiliado</label>
         <input id="link" type="url" placeholder="https://..." required>
@@ -253,6 +273,21 @@
       <div id="resultado" role="status"></div>
 
       <hr style="margin-top:30px">
+      <section class="gestao-categorias" aria-labelledby="titulo-gestao-categorias">
+        <h3 id="titulo-gestao-categorias">🗂️ Gerenciar categorias</h3>
+        <p class="info">Renomear atualiza as ofertas vinculadas. Apagar a categoria não exclui as ofertas: elas ficam sem categoria.</p>
+        <label for="categoria-gerenciar-lista">Categoria cadastrada</label>
+        <select id="categoria-gerenciar-lista"><option value="">Selecione</option></select>
+        <label for="categoria-renomear">Nome da categoria</label>
+        <input id="categoria-renomear" maxlength="100" placeholder="Novo nome">
+        <p id="aviso-gerenciar-categoria" class="aviso-duplicidade" role="status" aria-live="polite" hidden></p>
+        <div class="acoes">
+          <button id="btn-renomear-categoria" type="button" class="secundario">✏️ Renomear categoria</button>
+          <button id="btn-apagar-categoria" type="button" class="acao-perigosa">🗑️ Apagar categoria</button>
+        </div>
+      </section>
+
+      <hr style="margin-top:30px">
       <div class="topo">
         <h3>📦 Ofertas cadastradas</h3>
         <button id="btn-atualizar" type="button" class="secundario">Atualizar lista</button>
@@ -264,13 +299,19 @@
       <input type="search" id="pesquisar-produto"
              placeholder="Buscar por nome, loja ou categoria..."
              autocomplete="off">
-      <div id="lista-produtos"></div>
+      <label for="ordenacao-ofertas">Ordenar ofertas por data de publicação</label>
+        <select id="ordenacao-ofertas">
+          <option value="recentes">Publicação mais recente</option>
+          <option value="antigas">Publicação mais antiga</option>
+          <option value="cadastro">Cadastro mais recente</option>
+        </select>
+        <div id="lista-produtos"></div>
     </section>
 
     <div id="mensagem" role="status"></div>
   </main>
 
   <!-- Preservado: mesma lógica de login e cadastro existente. -->
-  <script type="module" src="./admin.js"></script>
+  <script type="module" src="./admin.js?v=20261126v51"></script>
 </body>
 </html>

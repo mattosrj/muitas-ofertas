@@ -77,7 +77,9 @@ function mensagemWhatsApp(produto) {
     "",
     `\u{1F449} Veja esta oferta em ${produto.loja}`,
     "",
-    `\u{1F4B0} ${moeda.format(produto.preco)}`,
+    (produto.preco_anterior != null && Number(produto.preco_anterior)>Number(produto.preco))
+      ? `\u{1F4B0} De: ~${moeda.format(produto.preco_anterior)}~ por *${moeda.format(produto.preco)}*`
+      : `\u{1F4B0} ${moeda.format(produto.preco)}`,
     ...(produto.codigo_cupom
       ? ["", `\u{1F39F}\uFE0F Cupom: ${produto.codigo_cupom}`]
       : []),
@@ -137,7 +139,14 @@ function criarCard(produto) {
   card.appendChild(imagem);
   card.appendChild(criar("span", "produto-loja", produto.loja));
   card.appendChild(criar("h3", "", produto.nome));
-  card.appendChild(criar("p", "produto-preco", moeda.format(produto.preco)));
+  const blocoPreco=criar('p','produto-preco');
+  if(produto.preco_anterior!=null && Number(produto.preco_anterior)>Number(produto.preco)){
+    const antigo=criar('span','preco-anterior');
+    antigo.append('De: ');
+    antigo.append(criar('del','',moeda.format(produto.preco_anterior)));
+    blocoPreco.append(antigo,criar('span','preco-atual','Por: '+moeda.format(produto.preco)));
+  }else blocoPreco.textContent=moeda.format(produto.preco);
+  card.appendChild(blocoPreco);
 
   // Exibir o código somente quando preenchido, imediatamente após o preço.
   if (produto.codigo_cupom) {
@@ -191,7 +200,7 @@ function criarCard(produto) {
 }
 function desenharCategorias() {
   if (!categorias) return;
-  const valores = ["Todas", ...[...new Set([...CATEGORIAS_BASE, ...produtos.map(p => p.categoria).filter(Boolean)])].filter(n => n !== "Todas").sort((a,b)=>a.localeCompare(b,"pt-BR"))];
+  const valores = ["Todas", ...[...new Set(produtos.map(p => p.categoria).filter(Boolean))].filter(n => n !== "Todas").sort((a,b)=>a.localeCompare(b,"pt-BR"))];
   if (!valores.includes(categoriaAtual)) categoriaAtual = "Todas";
   categorias.replaceChildren();
   for (const nome of valores) {
@@ -239,7 +248,7 @@ async function carregarOfertasPublicadas() {
   container.replaceChildren(criar("p", "catalogo-vazio", "Carregando ofertas..."));
   const { data, error } = await supabase
     .from("produtos")
-    .select("id,nome,preco,loja,categoria,link,imagem,codigo_cupom,criado_em")
+    .select("id,nome,preco,preco_anterior,loja,categoria,link,imagem,codigo_cupom,criado_em")
     .eq("publicado", true)
     .order("criado_em", { ascending: false });
   if (error) {
