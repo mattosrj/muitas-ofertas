@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="../images/favicon.png" type="image/png">
+  <title>Publicações fora do ar | Muitas Ofertas</title>
+  <script>
+  try {
+    const tema=localStorage.getItem('muitas-ofertas-tema');
+    const escritorio=window.matchMedia('(min-width:769px)').matches;
+    if(escritorio&&(tema==='light'||tema==='dark'))document.documentElement.dataset.theme=tema;
+  }catch{}
+  </script>
+  <style>
+    :root{color-scheme:light;--fundo:#f3f5f9;--card:#fff;--texto:#172033;--sec:#526071;--borda:#dce2ea;--campo:#fff;--verde:#166534}
+    @media(prefers-color-scheme:dark){:root:not([data-theme]){color-scheme:dark;--fundo:#10151d;--card:#1c2532;--texto:#f1f5f9;--sec:#aab7c8;--borda:#344154;--campo:#263142;--verde:#6ee7a2}}
+    :root[data-theme=dark]{color-scheme:dark;--fundo:#10151d;--card:#1c2532;--texto:#f1f5f9;--sec:#aab7c8;--borda:#344154;--campo:#263142;--verde:#6ee7a2}
+    *{box-sizing:border-box}body{margin:0;background:var(--fundo);color:var(--texto);font:15px/1.5 Arial,sans-serif}
+    .container{max-width:1060px;width:94%;margin:26px auto 60px}.topo{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+    h1{font-size:26px;margin:8px 0}h2{font-size:19px}a{color:var(--verde)}.muted{color:var(--sec)}
+    .painel{background:var(--card);border:1px solid var(--borda);border-radius:12px;padding:22px;margin:20px 0}
+    .filtros{display:flex;flex-wrap:wrap;gap:12px;margin:15px 0}.filtros input{flex:1 1 320px}.filtros select{flex:1 1 220px}
+    input,select{padding:11px;color:var(--texto);background:var(--campo);border:1px solid var(--borda);border-radius:7px;font:inherit}
+    button{background:#374151;color:white;border:0;padding:10px 13px;border-radius:7px;font:inherit;cursor:pointer}button:hover{filter:brightness(1.1)}button:disabled{opacity:.55;cursor:not-allowed}
+    .perigo{background:#9f1239}.acoes{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:14px 0}
+    .linha-oferta{border-bottom:1px solid var(--borda);padding:16px 4px;display:flex;gap:13px;align-items:flex-start}.linha-oferta:last-child{border-bottom:0}
+    .linha-oferta input[type=checkbox]{width:20px;height:20px;flex-shrink:0;margin-top:3px}.oferta-corpo{min-width:0;flex:1}.oferta-corpo strong{font-size:16px;overflow-wrap:anywhere}
+    .oferta-corpo p{margin:5px 0}.nome-loja{color:var(--sec)}.aviso{margin:12px 0;padding:12px;border-radius:8px;background:var(--card);border:1px solid var(--borda)}
+    .status{margin:10px 0;min-height:20px}.vazio{padding:24px;text-align:center;color:var(--sec)}
+    [hidden]{display:none!important}
+    @media(max-width:600px){.painel{padding:15px}.container{margin-top:15px}h1{font-size:22px}}
+  </style>
+  <script defer src="../js/tema.js"></script>
+</head>
+<body>
+  <main class="container">
+    <div class="topo"><div><p>🔥 Muitas Ofertas</p><h1>📦 Publicações fora do ar</h1></div>
+      <a href="./index.html">← Voltar ao Admin</a></div>
+    <p class="muted">Ofertas retiradas do ar, inclusive as vencidas do Mercado Livre. Elas não aparecem no site público.</p>
+    <div id="aviso-login" class="aviso" hidden>Entre pelo <a href="./index.html">Admin</a> para consultar as publicações.</div>
+    <section class="painel" id="painel-fora" hidden>
+      <h2>Ofertas arquivadas <span id="total">(0)</span></h2>
+      <div class="filtros">
+        <input type="search" id="pesquisa" placeholder="Pesquisar nome, loja ou categoria" aria-label="Pesquisar publicações">
+        <select id="ordenacao" aria-label="Ordenar publicações">
+          <option value="encerramento-desc">Retirada mais recente</option>
+          <option value="encerramento-asc">Retirada mais antiga</option>
+          <option value="publicacao-desc">Publicação mais recente</option>
+          <option value="publicacao-asc">Publicação mais antiga</option>
+        </select>
+      </div>
+      <div class="acoes">
+        <label><input type="checkbox" id="selecionar-visiveis"> Selecionar todas as ofertas exibidas</label>
+        <button type="button" id="apagar-selecionadas" class="perigo" disabled>🗑️ Apagar selecionadas (0)</button>
+        <button type="button" id="atualizar">Atualizar lista</button>
+      </div>
+      <p class="muted">A exclusão em lote é definitiva. Selecione apenas as ofertas que deseja remover.</p>
+      <p id="status" class="status muted" role="status" aria-live="polite"></p>
+      <div id="lista"></div>
+    </section>
+  </main>
+  <script type="module" src="./fora-do-ar.js?v=20261126v5"></script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 // Painel de campanhas de cupons — Muitas Ofertas.
 // Usa somente chave PÚBLICA do Supabase. Permissões reais são impostas pela RLS.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { imagemPorLoja, imagemDaCampanha, tituloDaCampanha, mensagemCupom, configurarImagem, normalizarObservacoes } from '../js/cupons-utils.js?v=20261125v3';
+import { imagemPorLoja, imagemDaCampanha, tituloDaCampanha, mensagemCupom, configurarImagem, normalizarObservacoes } from '../js/cupons-utils.js?v=20261125v4';
 const supabase = createClient('https://gtifivpqkmuofhdnkotn.supabase.co', 'sb_publishable_5NSEEZgb_TsEucB0-_OCog_re5mvf-O');
 const $ = id => document.getElementById(id);
 const LOJA_OUTRA = 'Outra';
@@ -10,12 +10,70 @@ let itensPorCampanha = new Map();
 let idEmEdicao = null;
 let idsOriginais = new Set();
 let bloqueado = false;
+let temporizadorAviso;
+function normalizarCodigo(valor){
+  return String(valor||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLocaleUpperCase('pt-BR').replace(/[^A-Z0-9]/g,'');
+}
+function similaridadeCodigo(a,b){
+  a=normalizarCodigo(a);b=normalizarCodigo(b);
+  if(!a||!b)return 0;
+  if(a===b)return 1;
+  if(a.length<5||b.length<5)return 0;
+  let m=0;const n=Math.min(a.length,b.length);
+  for(let i=0;i<n;i++)if(a[i]===b[i])m++;
+  const prefixo=m/Math.max(a.length,b.length);
+  // Códigos curtos diferentes podem ter descontos distintos: alertas conservadores.
+  const bi=s=>{const mp=new Map();for(let i=0;i<s.length-1;i++){const k=s.slice(i,i+2);mp.set(k,(mp.get(k)||0)+1);}return mp;};
+  const p=bi(a),q=bi(b);let inter=0;for(const [k,n] of p)inter+=Math.min(n,q.get(k)||0);
+  const dice=2*inter/(a.length+b.length-2);
+  return Math.max(dice,prefixo*.95);
+}
+function encontrarCodigosRepetidos(){
+  const avisos=[];
+  const blocos=[...$('itens-form').children];
+  for(const bloco of blocos){
+    const campo=bloco.querySelector('.codigo');
+    const codigo=campo?.value.trim();if(!codigo)continue;
+    for(const outro of blocos){
+      if(outro===bloco)continue;
+      const outraChave=outro.querySelector('.codigo')?.value.trim();
+      if(outraChave && normalizarCodigo(codigo)===normalizarCodigo(outraChave)){
+        avisos.push(`“${codigo}” aparece mais de uma vez nesta campanha.`);break;
+      }
+    }
+    for(const c of campanhas){
+      for(const item of itensPorCampanha.get(c.id)||[]){
+        // Ao editar um item existente, ele não deve ser comparado consigo mesmo.
+        if(item.id===bloco.dataset.id)continue;
+        const nota=similaridadeCodigo(codigo,item.codigo);
+        if(nota>=.80)avisos.push(`${nota===1?'Código já cadastrado':'Código parecido'}: “${item.codigo}” (${c.titulo} — ${c.publicado?'publicada':'rascunho'}).`);
+      }
+    }
+  }
+  return [...new Set(avisos)].slice(0,5);
+}
+function atualizarAvisosCodigo(){
+  const avisos=encontrarCodigosRepetidos();
+  const el=$('aviso-duplicidade-cupom');
+  el.hidden=!avisos.length;
+  if(avisos.length)el.textContent='⚠️ Verifique antes de salvar: '+avisos.join(' • ');
+  return avisos;
+}
+let timerCodigo;
+$('itens-form').addEventListener('input',e=>{
+  if(e.target.matches('.codigo')){
+    clearTimeout(timerCodigo);timerCodigo=setTimeout(atualizarAvisosCodigo,150);
+  }
+});
+
 
 function aviso(texto, tipo='info') {
   const el = $('resultado-cupons');
   el.textContent = texto;
   el.className = `aviso ${tipo}`;
-  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  clearTimeout(temporizadorAviso);
+  temporizadorAviso=setTimeout(()=>{el.textContent='';el.className='';}, tipo==='erro'?8500:tipo==='sucesso'?4200:3000);
 }
 function urlHttps(valor, obrigatoria=false) {
   const texto = String(valor || '').trim();
@@ -98,11 +156,11 @@ function adicionarItem(item={}) {
       return;
     }
     bloco.remove();
-    atualizarPreviaPostagem();
+    atualizarPreviaPostagem(); atualizarAvisosCodigo();
   });
   bloco.append(campos, remover);
   $('itens-form').appendChild(bloco);
-  atualizarPreviaPostagem();
+  atualizarPreviaPostagem(); atualizarAvisosCodigo();
 }
 $('adicionar-item').addEventListener('click', () => adicionarItem());
 
@@ -116,7 +174,7 @@ function novoCadastro() {
   $('salvar').textContent = 'Salvar como rascunho';
   $('cancelar').hidden = true;
   ajustarOutraLoja();
-  atualizarPrevias();
+  atualizarPrevias(); atualizarAvisosCodigo();
 }
 $('cancelar').addEventListener('click', () => { novoCadastro(); aviso('Edição cancelada.'); });
 
@@ -170,6 +228,7 @@ function editarCampanha(campanha) {
   $('titulo-formulario').textContent = '✏️ Editar campanha';
   $('salvar').textContent = 'Salvar alterações';
   $('cancelar').hidden = false;
+  atualizarAvisosCodigo();
   $('titulo-formulario').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -191,6 +250,10 @@ $('form-campanha').addEventListener('submit', async evento => {
     if (!await conferirAdmin()) throw new Error('Sessão expirada ou sem permissão de administrador.');
     const itens = coletarItens();
     const dados = coletarCampanha(itens);
+    const avisosCodigos=atualizarAvisosCodigo();
+    if(avisosCodigos.length && !confirm('⚠️ Código(s) igual(is) ou parecido(s) já cadastrado(s):\n'+avisosCodigos.join('\n')+'\n\nDeseja salvar mesmo assim?')){
+      throw new Error('Cadastro cancelado para evitar possíveis duplicidades.');
+    }
     const editando = Boolean(idEmEdicao);
     let id = idEmEdicao;
     if (editando) {
@@ -353,6 +416,23 @@ async function alterarPublicacao(campanha) {
   finally { bloqueado=false; }
 }
 
+async function apagarCampanha(campanha) {
+  if(bloqueado)return;
+  const itens=itensPorCampanha.get(campanha.id)||[];
+  if(!confirm(`Apagar DEFINITIVAMENTE a campanha “${campanha.titulo}” (${campanha.publicado?'publicada':'rascunho'}) e seus ${itens.length} cupom(ns)?\n\nEsta operação não pode ser desfeita pelo painel.`))return;
+  bloqueado=true;
+  try{
+    if(!await conferirAdmin())throw new Error('Sessão expirada ou sem permissão de administrador.');
+    // A FK cupom_itens.cupom_id ON DELETE CASCADE apaga os códigos vinculados.
+    const {data,error}=await supabase.from('cupons').delete().eq('id',campanha.id).select('id').maybeSingle();
+    if(error||!data)throw error||new Error('Exclusão negada. Confira a política RLS do Supabase.');
+    if(idEmEdicao===campanha.id)novoCadastro();
+    aviso('✅ Campanha e cupons vinculados apagados.','sucesso');
+    await carregarCampanhas();
+  }catch(erro){console.error(erro);aviso(erro.message||'Erro ao apagar campanha.','erro');}
+  finally{bloqueado=false;}
+}
+
 function renderizarCampanhas() {
   const termo = $('pesquisar').value.toLocaleLowerCase('pt-BR').trim();
   const filtro = $('filtro-publicacao').value;
@@ -362,6 +442,12 @@ function renderizarCampanhas() {
       .filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
     return pesquisa.includes(termo) && (filtro==='todas' ||
       (filtro==='publicadas' ? c.publicado : !c.publicado));
+  }).sort((a,b)=>{
+    const modo=$('ordenacao-campanhas').value;
+    const campo=modo==='cadastro'?'criado_em':'publicado_em';
+    const ta=Date.parse(a[campo]||a.criado_em||0)||0;
+    const tb=Date.parse(b[campo]||b.criado_em||0)||0;
+    return modo==='antigas'?ta-tb:tb-ta;
   });
   $('contador').textContent = `${campanhas.length} campanha(s) cadastrada(s). ${campanhas.filter(c => !c.publicado).length} rascunho(s).`;
   const lista = $('lista-campanhas');
@@ -377,9 +463,11 @@ function renderizarCampanhas() {
     card.appendChild(criar('h3','',tituloDaCampanha(campanha,itensPorCampanha.get(campanha.id)||[])));
     card.appendChild(criar('p','muted',campanha.loja));
     card.appendChild(criar('p','estado '+(campanha.publicado?'ativo':''),campanha.publicado?'🟢 Publicada':'🟡 Rascunho'));
+    card.appendChild(criar('p','muted pequeno',campanha.publicado_em
+      ? '🕒 Publicada em: '+new Date(campanha.publicado_em).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',dateStyle:'short',timeStyle:'short'})
+      : '🕒 Ainda não publicada'));
     if (campanha.destaque) card.appendChild(criar('p','',campanha.destaque));
     if (campanha.validade) card.appendChild(criar('p','muted',`Validade informada: ${new Date(campanha.validade+'T12:00:00').toLocaleDateString('pt-BR')}`));
-    if (campanha.observacoes) card.appendChild(criar('p','muted observacoes-admin',campanha.observacoes));
     if (campanha.observacoes) card.appendChild(criar('p','muted observacoes-admin',normalizarObservacoes(campanha.observacoes)));
     const ul = criar('ul');
     (itensPorCampanha.get(campanha.id)||[]).forEach(item => ul.appendChild(criar('li','', `${item.codigo ? item.codigo+' — ' : ''}${item.descricao}`)));
@@ -393,6 +481,7 @@ function renderizarCampanhas() {
       criarBotao('📲 Imagem + texto','principal',()=>compartilharImagemTexto(campanha,itensPorCampanha.get(campanha.id)||[])),
       criarBotao(campanha.publicado?'📥 Tirar do ar':'🚀 Publicar',campanha.publicado?'secundario':'principal',()=>alterarPublicacao(campanha))
     );
+    acoes.appendChild(criarBotao('🗑️ Apagar campanha','perigo',()=>apagarCampanha(campanha)));
     if (campanha.publicado) {
       acoes.appendChild(criarLinkEnvioWhatsApp(campanha));
     } else {
@@ -407,6 +496,7 @@ function renderizarCampanhas() {
 }
 $('pesquisar').addEventListener('input',renderizarCampanhas);
 $('filtro-publicacao').addEventListener('change',renderizarCampanhas);
+$('ordenacao-campanhas').addEventListener('change',renderizarCampanhas);
 $('atualizar').addEventListener('click',carregarCampanhas);
 
 async function carregarCampanhas() {
@@ -422,7 +512,7 @@ async function carregarCampanhas() {
       if (erroItens) throw erroItens;
       for (const item of (itens||[])) itensPorCampanha.get(item.cupom_id)?.push(item);
     }
-    renderizarCampanhas();
+    renderizarCampanhas(); atualizarAvisosCodigo();
   } catch (erro) {
     console.error('Erro ao listar campanhas:',erro);
     $('contador').textContent = 'Erro ao carregar campanhas. Confirme que executou o SQL de instalação.';

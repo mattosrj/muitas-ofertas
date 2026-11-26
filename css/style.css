@@ -480,3 +480,8 @@ header.topo .navegacao-loja a.mo-campanhas-nav {text-decoration:none}
 @media(max-width:680px) {
   header.topo .navegacao-loja {flex-wrap:wrap;justify-content:flex-start;column-gap:14px;row-gap:3px}
 }
+
+/* v4: preço de referência opcional nos produtos */
+.produto-preco .preco-anterior{display:block;color:var(--cor-texto-secundario);font-size:14px;font-weight:400;margin:0 0 2px}
+.produto-preco .preco-anterior del{text-decoration:line-through;opacity:.9}
+.produto-preco .preco-atual{display:block;color:var(--cor-preco);font-size:23px;font-weight:700}
