@@ -59,16 +59,14 @@ function urlSegura(valor) {
     return url.protocol === "https:" ? url.href : "";
   } catch { return ""; }
 }
-function tempoDesdeCadastro(valor) {
+function formatarDataPublicacao(valor) {
   if (!valor) return "";
   const data = new Date(valor);
   if (Number.isNaN(data.getTime())) return "";
-  const agora = new Date();
-  const diaUTC = d => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-  const dias = Math.max(0, Math.round((diaUTC(agora) - diaUTC(data)) / 86400000));
-  if (dias === 0) return "Hoje";
-  if (dias === 1) return "Ontem";
-  return `Há ${dias} dias`;
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit", month: "2-digit", year: "numeric"
+  }).format(data);
 }
 
 function mensagemWhatsApp(produto) {
@@ -159,8 +157,10 @@ function criarCard(produto) {
     cupom.append(texto, botao);
     card.appendChild(cupom);
   }
-  const tempo = tempoDesdeCadastro(produto.criado_em);
-  if (tempo) card.appendChild(criar("p", "produto-tempo", `🕒 ${tempo}`));
+  const dataPublicacao = formatarDataPublicacao(produto.publicado_em);
+  if (dataPublicacao) {
+    card.appendChild(criar("p", "produto-tempo", `📅 Publicada em: ${dataPublicacao}`));
+  }
 
   const acoes = criar("div", "produto-acoes");
   const link = urlSegura(produto.link);
@@ -248,9 +248,9 @@ async function carregarOfertasPublicadas() {
   container.replaceChildren(criar("p", "catalogo-vazio", "Carregando ofertas..."));
   const { data, error } = await supabase
     .from("produtos")
-    .select("id,nome,preco,preco_anterior,loja,categoria,link,imagem,codigo_cupom,criado_em")
+    .select("id,nome,preco,preco_anterior,loja,categoria,link,imagem,codigo_cupom,criado_em,publicado_em")
     .eq("publicado", true)
-    .order("criado_em", { ascending: false });
+    .order("publicado_em", { ascending: false });
   if (error) {
     console.error("Falha ao carregar ofertas publicadas:", error);
     container.replaceChildren(criar("p", "catalogo-vazio", "Não foi possível carregar as ofertas agora."));
