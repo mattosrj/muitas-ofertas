@@ -24,6 +24,9 @@
     .filtros{display:flex;flex-wrap:wrap;gap:12px;margin:15px 0}.filtros input{flex:1 1 320px}.filtros select{flex:1 1 220px}
     input,select{padding:11px;color:var(--texto);background:var(--campo);border:1px solid var(--borda);border-radius:7px;font:inherit}
     button{background:#374151;color:white;border:0;padding:10px 13px;border-radius:7px;font:inherit;cursor:pointer}button:hover{filter:brightness(1.1)}button:disabled{opacity:.55;cursor:not-allowed}
+    .btn-editar-oferta{display:inline-block;margin-top:9px;padding:9px 14px;border-radius:7px;background:var(--verde);color:#fff;text-decoration:none;font-weight:bold}
+    :root[data-theme=dark] .btn-editar-oferta{color:#10151d}
+    @media(prefers-color-scheme:dark){:root:not([data-theme]) .btn-editar-oferta{color:#10151d}}
     .perigo{background:#9f1239}.acoes{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:14px 0}
     .linha-oferta{border-bottom:1px solid var(--borda);padding:16px 4px;display:flex;gap:13px;align-items:flex-start}.linha-oferta:last-child{border-bottom:0}
     .linha-oferta input[type=checkbox]{width:20px;height:20px;flex-shrink:0;margin-top:3px}.oferta-corpo{min-width:0;flex:1}.oferta-corpo strong{font-size:16px;overflow-wrap:anywhere}
@@ -38,7 +41,7 @@
   <main class="container">
     <div class="topo"><div><p>🔥 Muitas Ofertas</p><h1>📦 Publicações fora do ar</h1></div>
       <a href="./index.html">← Voltar ao Admin</a></div>
-    <p class="muted">Ofertas retiradas do ar, inclusive as vencidas do Mercado Livre. Elas não aparecem no site público.</p>
+    <p class="muted">Ofertas retiradas do ar não aparecem no site público. Agora você pode editar seus dados e republicá-las com um link válido.</p>
     <div id="aviso-login" class="aviso" hidden>Entre pelo <a href="./index.html">Admin</a> para consultar as publicações.</div>
     <section class="painel" id="painel-fora" hidden>
       <h2>Ofertas arquivadas <span id="total">(0)</span></h2>
@@ -61,6 +64,6 @@
       <div id="lista"></div>
     </section>
   </main>
-  <script type="module" src="./fora-do-ar.js?v=20261126v5"></script>
+  <script type="module" src="./fora-do-ar.js?v=20261127v53"></script>
 </body>
 </html>

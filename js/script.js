@@ -157,7 +157,7 @@ function criarCard(produto) {
     cupom.append(texto, botao);
     card.appendChild(cupom);
   }
-  const dataPublicacao = formatarDataPublicacao(produto.publicado_em);
+  const dataPublicacao = formatarDataPublicacao(produto.postagem_em || produto.publicado_em);
   if (dataPublicacao) {
     card.appendChild(criar("p", "produto-tempo", `📅 Publicada em: ${dataPublicacao}`));
   }
@@ -248,9 +248,9 @@ async function carregarOfertasPublicadas() {
   container.replaceChildren(criar("p", "catalogo-vazio", "Carregando ofertas..."));
   const { data, error } = await supabase
     .from("produtos")
-    .select("id,nome,preco,preco_anterior,loja,categoria,link,imagem,codigo_cupom,criado_em,publicado_em")
+    .select("id,nome,preco,preco_anterior,loja,categoria,link,imagem,codigo_cupom,criado_em,publicado_em,postagem_em")
     .eq("publicado", true)
-    .order("publicado_em", { ascending: false });
+    .order("postagem_em", { ascending: false, nullsFirst: false });
   if (error) {
     console.error("Falha ao carregar ofertas publicadas:", error);
     container.replaceChildren(criar("p", "catalogo-vazio", "Não foi possível carregar as ofertas agora."));
