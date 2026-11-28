@@ -44,9 +44,13 @@ function renderizar(){
     const corpo=criar('div','oferta-corpo');
     corpo.append(criar('strong','',oferta.nome),criar('p','nome-loja',`${oferta.loja||'Loja não informada'} | ${oferta.categoria||'Sem categoria'}`),
       criar('p','',moeda.format(Number(oferta.preco)||0)),
-      criar('p','',`🕒 Publicada em: ${dataBR(oferta.publicado_em)}`),
+      criar('p','',`🕒 Última postagem: ${dataBR(oferta.postagem_em||oferta.publicado_em)}`),
       criar('p','',`📥 Retirada do ar: ${dataBR(oferta.encerrado_em)}`),
       criar('p','muted',`Motivo: ${oferta.motivo_fora_ar||'Retirada do ar'}`));
+    const editar=criar('a','btn-editar-oferta','✏️ Editar / republicar');
+    editar.href='./index.html?editar='+encodeURIComponent(oferta.id);
+    editar.setAttribute('aria-label',`Editar ou republicar ${oferta.nome}`);
+    corpo.append(editar);
     linha.append(check,corpo);lista.append(linha);
   }
   atualizarAcoes();
@@ -58,7 +62,7 @@ async function carregar(){
     // A lista pode ser maior que 1000 registros; paginação evita omissões silenciosas.
     let todos=[];const tamanho=500;
     for(let inicio=0;inicio<10000;inicio+=tamanho){
-      const {data,error}=await supabase.from('produtos').select('id,nome,loja,categoria,preco,publicado_em,encerrado_em,motivo_fora_ar,criado_em')
+      const {data,error}=await supabase.from('produtos').select('id,nome,loja,categoria,preco,publicado_em,postagem_em,encerrado_em,motivo_fora_ar,criado_em')
         .not('encerrado_em','is',null).eq('publicado',false).order('encerrado_em',{ascending:false}).range(inicio,inicio+tamanho-1);
       if(error)throw error;
       todos.push(...(data||[]));if(!data||data.length<tamanho)break;

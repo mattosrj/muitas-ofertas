@@ -215,7 +215,7 @@
       </div>
       <div class="acesso-arquivo">
         <a href="./fora-do-ar.html" class="link-arquivo">📦 Publicações fora do ar <strong id="contador-fora-do-ar">(0)</strong></a>
-        <p class="info">Ofertas encerradas ficam guardadas para consulta e exclusão em lote.</p>
+        <p class="info">Ofertas encerradas ficam disponíveis para editar, republicar ou excluir em lote.</p>
       </div>
       <div id="aviso-pendencias" hidden role="status" class="pendencias"><strong id="texto-pendencias"></strong> <button id="btn-pendentes" type="button">Ver pendentes</button></div>
       <hr>
@@ -224,6 +224,7 @@
       <p id="aviso-edicao" class="edicao" hidden>
         ✏️ Você está editando uma oferta existente.
       </p>
+      <a href="./fora-do-ar.html" id="voltar-fora-ar" class="link-arquivo" hidden>← Voltar às publicações fora do ar</a>
 
       <form id="form-produto">
         <label for="nome">Nome do produto</label>
@@ -301,8 +302,8 @@
              autocomplete="off">
       <label for="ordenacao-ofertas">Ordenar ofertas por data de publicação</label>
         <select id="ordenacao-ofertas">
-          <option value="recentes">Publicação mais recente</option>
-          <option value="antigas">Publicação mais antiga</option>
+          <option value="recentes">Postagem mais recente</option>
+          <option value="antigas">Postagem mais antiga</option>
           <option value="cadastro">Cadastro mais recente</option>
         </select>
         <div id="lista-produtos"></div>
@@ -312,6 +313,6 @@
   </main>
 
   <!-- Preservado: mesma lógica de login e cadastro existente. -->
-  <script type="module" src="./admin.js?v=20261126v51"></script>
+  <script type="module" src="./admin.js?v=20261128v533"></script>
 </body>
 </html>

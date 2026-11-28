@@ -21,6 +21,7 @@ const botaoSalvar = $("btn-salvar");
 
 let ofertas = [];
 let produtoEmEdicao = null;
+let produtoEmEdicaoOriginal = null;
 let somentePendentes = false;
 let buscaImagemSeq = 0, timerImagem, controleImagem, imagemAuto = '';
 let categoriasAtivas = [];
@@ -206,7 +207,10 @@ function mostrarPainel(usuario) {
     "Administrador: " + usuario.email;
 
   informar($("mensagem"), "");
-  carregarCategorias().then(carregarOfertas).catch(console.error);
+  carregarCategorias()
+    .then(carregarOfertas)
+    .then(abrirOfertaArquivadaDaUrl)
+    .catch(erro=>{console.error(erro);informar($("resultado"),"Erro ao abrir oferta: "+erro.message,"erro");});
 }
 
 // VERIFICAR PERMISSÃO
@@ -317,6 +321,7 @@ function validarUrl(valor) {
 // VOLTAR AO MODO CADASTRO
 function limparEdicao() {
   produtoEmEdicao = null;
+  produtoEmEdicaoOriginal = null;
   cancelarBuscaImagem(); imagemAuto='';
   formularioProduto.reset();
   atualizarCategorias(); mostrarPrevia(''); atualizarAvisoProduto();
@@ -328,11 +333,23 @@ function limparEdicao() {
 
   $("btn-cancelar").style.display = "none";
   $("aviso-edicao").hidden = true;
+  $("aviso-edicao").textContent = "✏️ Você está editando uma oferta existente.";
+  // Evita reabrir uma oferta já republicada se o Admin for atualizado.
+  const endereco = new URL(window.location.href);
+  if (endereco.searchParams.has('editar')) {
+    endereco.searchParams.delete('editar');
+    window.history.replaceState(null, '', endereco.pathname + endereco.search + endereco.hash);
+  }
 }
 
 // EDITAR PRODUTO
 function editarProduto(produto) {
   produtoEmEdicao = produto.id;
+  produtoEmEdicaoOriginal = produto;
+  const arquivada = Boolean(produto.encerrado_em) && !produto.publicado;
+  $("aviso-edicao").textContent = arquivada
+    ? "✏️ Oferta fora do ar: ao salvar, ela será republicada automaticamente. Confira se o link ainda está válido."
+    : "✏️ Você está editando uma oferta existente.";
 
   $("nome").value = produto.nome;
   $("preco-anterior").value = produto.preco_anterior != null
@@ -352,7 +369,7 @@ function editarProduto(produto) {
   $("titulo-formulario").textContent =
     "✏️ Editar oferta";
 
-  $("btn-salvar").textContent = "Salvar alterações";
+  $("btn-salvar").textContent = arquivada ? "Salvar e republicar" : "Salvar alterações";
 
   $("btn-cancelar").style.display = "block";
   $("aviso-edicao").hidden = false;
@@ -366,6 +383,28 @@ function editarProduto(produto) {
 
   atualizarAvisoProduto();
   $("nome").focus({ preventScroll: true });
+}
+
+// Entrada direta de uma oferta da página "Publicações fora do ar".
+// O ID é validado e o registro só pode ser lido após autenticação/admin/RLS.
+async function abrirOfertaArquivadaDaUrl() {
+  const id = new URLSearchParams(window.location.search).get('editar');
+  if (!id) return;
+  $("voltar-fora-ar").hidden = false;
+  // IDs no Supabase podem ser numéricos (bigint/serial) ou UUID.
+  // Aceitar somente um dos dois formatos evita parâmetros arbitrários na URL.
+  const idNumerico = /^[1-9][0-9]{0,18}$/.test(id);
+  const idUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  if (!idNumerico && !idUuid) {
+    throw new Error('Identificador da oferta inválido.');
+  }
+  const {data,error}=await supabase.from('produtos').select('*').eq('id',id).maybeSingle();
+  if (error) throw error;
+  if (!data || data.publicado || !data.encerrado_em) {
+    throw new Error('A oferta fora do ar não foi encontrada ou já está publicada.');
+  }
+  editarProduto(data);
+  informar($("resultado"),"Oferta fora do ar carregada. Ao salvar, ela será republicada automaticamente.");
 }
 
 $("btn-cancelar").addEventListener("click", () => {
@@ -432,6 +471,10 @@ formularioProduto.addEventListener(
         if(erroCategoria) throw new Error('Não foi possível criar a categoria: '+erroCategoria.message);
       }
       const editando = produtoEmEdicao !== null;
+      const eraArquivada = Boolean(produtoEmEdicaoOriginal?.encerrado_em) && !produtoEmEdicaoOriginal?.publicado;
+      // Salvar uma oferta arquivada também a republica, sem exigir alteração no link.
+      // O prazo de validade automática é reiniciado pelo trigger de publicação no Supabase.
+      const republicar = editando && eraArquivada;
 
       let resultado;
 
@@ -441,6 +484,7 @@ formularioProduto.addEventListener(
           .from("produtos")
           .update({
             ...produto,
+            ...(republicar ? { publicado: true } : {}),
             atualizado_em: new Date().toISOString()
           })
           .eq("id", produtoEmEdicao)
@@ -461,9 +505,7 @@ formularioProduto.addEventListener(
 
       if (resultado.error) {
         console.error(resultado.error);
-        throw new Error(
-          "Não foi possível salvar no Supabase."
-        );
+        throw new Error("Não foi possível salvar no Supabase: " + resultado.error.message);
       }
 
       limparEdicao();
@@ -471,7 +513,7 @@ formularioProduto.addEventListener(
       informar(
         $("resultado"),
         editando
-          ? "✅ Oferta atualizada com sucesso!"
+          ? (republicar ? "✅ Oferta editada e republicada!" : "✅ Oferta atualizada com sucesso!")
           : "✅ Oferta cadastrada como rascunho!",
         "sucesso"
       );
@@ -673,8 +715,8 @@ function criarCard(produto) {
   if(precoAnterior) card.appendChild(precoAnterior);
   const dataPublicacao=document.createElement('p');
   dataPublicacao.className='data-publicacao-admin';
-  dataPublicacao.textContent=produto.publicado_em
-    ? `🕒 Publicada em: ${formatarDataPublicacao(produto.publicado_em)}`
+  dataPublicacao.textContent=(produto.postagem_em||produto.publicado_em)
+    ? `🕒 Publicada em: ${formatarDataPublicacao(produto.postagem_em||produto.publicado_em)}`
     : '🕒 Ainda não publicada';
   const textoValidade=textoValidadeDaOfertaV51(produto);
   if(textoValidade){
@@ -804,9 +846,9 @@ function formatarDataPublicacao(valor){
 }
 function ordenarOfertasPorData(a,b){
   const modo=$('ordenacao-ofertas').value;
-  const campo=modo==='cadastro'?'criado_em':'publicado_em';
-  const dataA=Date.parse(a[campo]||a.criado_em||0)||0;
-  const dataB=Date.parse(b[campo]||b.criado_em||0)||0;
+  const campo=modo==='cadastro'?'criado_em':'postagem_em';
+  const dataA=Date.parse(a[campo]||a.publicado_em||a.criado_em||0)||0;
+  const dataB=Date.parse(b[campo]||b.publicado_em||b.criado_em||0)||0;
   return modo==='antigas' ? dataA-dataB : dataB-dataA;
 }
 function filtrarOfertas() {
